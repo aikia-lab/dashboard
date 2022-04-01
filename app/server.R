@@ -10,14 +10,13 @@
 library(shiny)
 library(DBI)
 
-connect_to_DB <- function(ip = "217.91.79.198", mydb){
+connect_to_DB <- function(mydb, group = "fin_data"){
   
   Checkmydb <- tryCatch(DBI::dbIsValid(mydb),
                         error=function(e) e)
   if(inherits(Checkmydb, "simpleError")){
     
-    mydb <- DBI::dbConnect(RMariaDB::MariaDB(), user='ceilert', password='ceilert', dbname='monkey', 
-                           host = ip, port= 3306, encoding = "utf8")
+    mydb <- DBI::dbConnect(RMariaDB::MariaDB(), group = group)
   }
 }
 
@@ -52,3 +51,4 @@ shinyServer(function(input, output) {
     
     
 })
+

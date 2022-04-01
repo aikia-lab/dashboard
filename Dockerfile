@@ -14,12 +14,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libmariadb-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# libmysqlclient seems to need an update before installing.
 RUN apt-get update && apt-get install -y libmysqlclient-dev
 
 COPY Rprofile.site /etc/R
+COPY /home/christian/my.cnf /etc
 ENV _R_SHLIB_STRIP_=true
 
-RUN install.r shiny forecast jsonlite ggplot2 htmltools DBI RMariaDB devtools remotes plotly
+RUN install.r shiny tidyverse forecast jsonlite htmltools DBI \ 
+    RMariaDB devtools remotes plotly \
+    scales gt shinydashboard
 #RUN Rscript -e "install.packages('plotly','forecast', 'jsonlite', 'ggplot2', 'htmltools', 'tidyquant', 'DBI', 'RMySQL', 'devtools', 'remotes', 'shinycssloaders', 'plotly')"
 RUN Rscript -e "remotes::install_github('daattali/shinycssloaders')"
 
