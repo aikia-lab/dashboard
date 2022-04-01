@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN apt-get update && apt-get install -y libmysqlclient-dev
 
 COPY Rprofile.site /etc/R
-COPY /home/christian/my.cnf /etc
+COPY /home/christian/dbconfig/my.cnf /etc
 ENV _R_SHLIB_STRIP_=true
 
 RUN install.r shiny tidyverse forecast jsonlite htmltools DBI \ 
