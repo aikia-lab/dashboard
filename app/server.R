@@ -16,7 +16,7 @@ connect_to_DB <- function(ip = "217.91.79.198", mydb){
                         error=function(e) e)
   if(inherits(Checkmydb, "simpleError")){
     
-    mydb <- DBI::dbConnect(RMySQL::MySQL(), user='ceilert', password='ceilert', dbname='monkey', 
+    mydb <- DBI::dbConnect(RMariaDB::MariaDB(), user='ceilert', password='ceilert', dbname='monkey', 
                            host = ip, port= 3306, encoding = "utf8")
   }
 }
