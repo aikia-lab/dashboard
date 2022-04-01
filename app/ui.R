@@ -29,7 +29,9 @@ shinyUI(fluidPage(
         mainPanel(
             plotOutput("distPlot"),
             
-            verbatimTextOutput("db_test")
+            verbatimTextOutput("db_test"),
+            
+            gt::gt_output("db_gt")
         )
     )
 ))

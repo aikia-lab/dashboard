@@ -9,6 +9,7 @@
 
 library(shiny)
 library(DBI)
+library(magrittr)
 
 connect_to_DB <- function(mydb, group = "fin_data"){
   
@@ -48,7 +49,16 @@ shinyServer(function(input, output) {
       
     })
     
-    
+    output$db_gt <- gt::render_gt({
+      
+      mydb <- connect_to_DB()
+      
+      DBI::dbGetQuery(mydb,
+                      "SELECT *
+                      FROM fin_data.v_fin_index_expanded") %>% 
+        gt::gt()
+      
+    })
     
 })
 
