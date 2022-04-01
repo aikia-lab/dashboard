@@ -8,6 +8,19 @@
 #
 
 library(shiny)
+library(DBI)
+
+connect_to_DB <- function(ip = "217.91.79.198", mydb){
+  
+  Checkmydb <- tryCatch(DBI::dbIsValid(mydb),
+                        error=function(e) e)
+  if(inherits(Checkmydb, "simpleError")){
+    
+    mydb <- DBI::dbConnect(RMySQL::MySQL(), user='ceilert', password='ceilert', dbname='monkey', 
+                           host = ip, port= 3306, encoding = "utf8")
+  }
+}
+
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -22,6 +35,9 @@ shinyServer(function(input, output) {
         hist(x, breaks = bins, col = 'darkgray', border = 'white')
         
 
+        mydb <- connect_to_DB()
+        
+        DBI::dbListTables(mydb)
 # Financial Sector Plots --------------------------------------------------
 
         
