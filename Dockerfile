@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY Rprofile.site /etc/R
 ENV _R_SHLIB_STRIP_=true
 
-RUN install.r shiny forecast jsonlite ggplot2 htmltools tidyquant
+RUN install.r shiny forecast jsonlite ggplot2 htmltools tidyquant DBI
 RUN Rscript -e "install.packages('plotly')"
 
 RUN echo "local(options(shiny.port = 3838, shiny.host = '0.0.0.0'))" > /usr/lib/R/etc/Rprofile.site
