@@ -1,6 +1,6 @@
 FROM rocker/r-ubuntu:20.04
 
-LABEL maintainer="Peter Solymos <peter@analythium.io>"
+LABEL maintainer="aikia <aikia.update@gmail.com>"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
@@ -11,13 +11,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxt-dev \
     libssl-dev \
     libssh2-1-dev \
+    libmariadb-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY Rprofile.site /etc/R
 ENV _R_SHLIB_STRIP_=true
 
-RUN install.r shiny forecast jsonlite ggplot2 htmltools tidyquant DBI
-RUN Rscript -e "install.packages('plotly')"
+RUN install.r shiny forecast jsonlite ggplot2 htmltools DBI RMariaDB devtools remotes plotly
+#RUN Rscript -e "install.packages('plotly','forecast', 'jsonlite', 'ggplot2', 'htmltools', 'tidyquant', 'DBI', 'RMySQL', 'devtools', 'remotes', 'shinycssloaders', 'plotly')"
+RUN Rscript -e "remotes::install_github('daattali/shinycssloaders')"
 
 RUN echo "local(options(shiny.port = 3838, shiny.host = '0.0.0.0'))" > /usr/lib/R/etc/Rprofile.site
 
