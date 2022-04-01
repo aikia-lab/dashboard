@@ -33,15 +33,22 @@ shinyServer(function(input, output) {
 
         # draw the histogram with the specified number of bins
         hist(x, breaks = bins, col = 'darkgray', border = 'white')
-        
-
-        mydb <- connect_to_DB()
-        
-        DBI::dbListTables(mydb)
 # Financial Sector Plots --------------------------------------------------
 
         
 
     })
 
+    
+    output$db_test <- renderPrint({
+      
+      mydb <- connect_to_DB()
+      
+      print(DBI::dbListTables(mydb))
+      
+      
+    })
+    
+    
+    
 })
