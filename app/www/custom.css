@@ -1,25 +1,25 @@
 .navbar{
-  background-color: #248A8A!important;
+  background-color: #092525!important;
 }
 
 .main-sidebar{
-  background-color: #248A8A!important;
+  background-color: #092525!important;
 }
 
 .logo{
-  background-color: #374B9D!important;
+  background-color: #092525!important;
 }
 
 .bg-teal{
-  background-color: #248A8A!important;
+  background-color: #092525!important;
 }
 
 .sidebar-toggle:hover{
-  background-color: #374B9D!important;
+  background-color: #61b7b7!important;
 }
 
 .sidebar-menu>li:hover>a{
-  background-color: #374B9D!important;
+  background-color: #61b7b7!important;
   border-left-color:#61b7b7!important;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .sidebar-menu .treeview-menu{
-  background-color: #248A8A!important;
+  background-color: #092525!important;
 }
 
 .skin-blue .sidebar-menu>li.active>a, .skin-blue .sidebar-menu>li:hover>a{
@@ -58,4 +58,15 @@
   color: #FFF;
 }
 
-.skin-blue .treeview-menu>li.active>a, 
+.skin-blue .treeview-menu>li.active>a, .skin-blue .treeview-menu>li>a.hover{
+   background-color: #61b7b7!important;
+}
+
+#index_location.shinythings-radio-inputs label{
+  background-color: #092525!important;
+}
+
+#index_location.shinythings-radio-inputs input:checked + label{
+  background-color: #61B7B7!important;
+  
+}
