@@ -22,6 +22,8 @@ COPY ld.so.conf /etc
 COPY my.cnf /etc
 ENV _R_SHLIB_STRIP_=true
 
+RUN sudo ldconfig
+
 RUN install.r shiny tidyverse forecast jsonlite htmltools DBI \ 
     RMariaDB devtools remotes plotly fs RQuantLib \
     scales gt shinydashboard bizdays  
