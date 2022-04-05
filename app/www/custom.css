@@ -1,17 +1,17 @@
 .navbar{
-  background-color: #092525!important;
+  background-color: #0e3a3a!important;
 }
 
 .main-sidebar{
-  background-color: #092525!important;
+  background-color: #0e3a3a!important;
 }
 
 .logo{
-  background-color: #092525!important;
+  background-color: #61B7B7!important;
 }
 
 .bg-teal{
-  background-color: #092525!important;
+  background-color: #0e3a3a!important;
 }
 
 .sidebar-toggle:hover{
@@ -34,7 +34,7 @@
 }
 
 .sidebar-menu .treeview-menu{
-  background-color: #092525!important;
+  background-color: #0e3a3a!important;
 }
 
 .skin-blue .sidebar-menu>li.active>a, .skin-blue .sidebar-menu>li:hover>a{
@@ -63,7 +63,7 @@
 }
 
 #index_location.shinythings-radio-inputs label{
-  background-color: #092525!important;
+  background-color: #0e3a3a!important;
 }
 
 #index_location.shinythings-radio-inputs input:checked + label{
