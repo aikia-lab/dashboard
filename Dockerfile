@@ -27,9 +27,9 @@ RUN sudo ldconfig
 
 RUN install.r shiny tidyverse forecast jsonlite htmltools DBI \ 
     RMariaDB devtools remotes plotly fs RQuantLib \
-    scales gt shinydashboard bizdays here
+    scales gt shinydashboard bizdays here patchwork ggtext heatmaply
     
-RUN Rscript -e "remotes::install_github('daattali/shinycssloaders')"
+RUN Rscript -e "remotes::install_github('daattali/shinycssloaders', 'gadenbuie/shinyThings')
 
 RUN echo "local(options(shiny.port = 3838, shiny.host = '0.0.0.0'))" > /usr/lib/R/etc/Rprofile.site
 
