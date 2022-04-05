@@ -12,8 +12,8 @@ bizdays::load_quantlib_calendars(c('UnitedStates/NYSE'),
                                  financial = TRUE)
 bizdays::create.calendar('UnitedStates/NYSE', financial = TRUE, weekdays = c("saturday", "sunday"))
 
-#sapply(as.character(fs::dir_ls(stringr::str_c(here::here(),"/scripts"))), source)
-sapply(as.character(fs::dir_ls(stringr::str_c(here::here(),"/app/scripts"))), source)
+sapply(as.character(fs::dir_ls(stringr::str_c(here::here(),"/scripts"))), source)
+#sapply(as.character(fs::dir_ls(stringr::str_c(here::here(),"/app/scripts"))), source)
 
 shinyUI(
     
