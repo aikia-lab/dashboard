@@ -22,9 +22,10 @@ COPY my.cnf /etc
 ENV _R_SHLIB_STRIP_=true
 
 RUN install.r shiny tidyverse forecast jsonlite htmltools DBI \ 
-    RMariaDB devtools remotes plotly \
-    scales gt shinydashboard
-#RUN Rscript -e "install.packages('plotly','forecast', 'jsonlite', 'ggplot2', 'htmltools', 'tidyquant', 'DBI', 'RMySQL', 'devtools', 'remotes', 'shinycssloaders', 'plotly')"
+    RMariaDB devtools remotes plotly fs RQuantLib \
+    scales gt shinydashboard bizdays  
+    
+RUN Rscript -e "install.packages('RQuantLib')"
 RUN Rscript -e "remotes::install_github('daattali/shinycssloaders')"
 
 RUN echo "local(options(shiny.port = 3838, shiny.host = '0.0.0.0'))" > /usr/lib/R/etc/Rprofile.site

@@ -10,7 +10,7 @@ connect_to_DB <- function(mydb, group = "fin_data"){
       
       mydb <- DBI::dbConnect(RMariaDB::MariaDB(), group = group, 
                              default.file = stringr::str_c(here::here(),
-                                                           "/.my.cnf"))
+                                                           "/my.cnf"))
       
     } else { #Production on Linux
       
