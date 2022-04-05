@@ -62,7 +62,9 @@ shinyUI(
                                                                     selected_background = main_color_light),
                                     
                                     shiny::fluidRow(
+                                        class = "text-center",
                                         shiny::h3("Sector Volatility Overview"),
+                                        shiny::h4("date to date relative change of volatility levels"),
                                         
                                         shiny::div( # wrapping Output in div lets us align it to the right
                                             plotly::plotlyOutput("sector_vola",
@@ -75,7 +77,8 @@ shinyUI(
                                         shiny::div(
                                             plotly::plotlyOutput("sector_line",
                                                                  width = "60%",
-                                                                 height = "600px"),
+                                                                 height = "600px") %>%
+                                                shinycssloaders::withSpinner(type = 8),
                                             align = "center",
                                             style = "border-top:1px solid black;"
                                         )

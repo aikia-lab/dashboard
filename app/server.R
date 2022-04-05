@@ -71,7 +71,7 @@ shinyServer(function(input, output) {
       dplyr::as_tibble()
 
     if(nrow(click_data) != 0){
-      
+  
       index <- plotly_click_mapping %>%
         dplyr::filter(curve == click_data[["curveNumber"]],
                       y == click_data[["y"]]) %>%
@@ -82,8 +82,10 @@ shinyServer(function(input, output) {
                         index_mapping = index_mapping, 
                         vola_history = vola_history)
     } else {
-      
-   #  shiny::HTML("Click on Heatmap Cells for respective Index Chart")
+     
+      validate(
+        need( nrow(click_data) != 0, "Click on Heatmap Cells for Index Price Chart")
+      )
       
     }
     

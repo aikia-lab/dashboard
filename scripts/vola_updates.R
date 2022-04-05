@@ -73,7 +73,7 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
   click_mapping <- tibble:::tibble(supersector = sector_list,
                                    curve = c(0:9))
   
-  plotly_click_mapping <<- index_mapping %>% 
+  plotly_click_mapping <<- location_idx %>% 
     dplyr::left_join(click_mapping, by = "supersector") %>% 
     dplyr::filter(!is.na(curve)) %>% 
     dplyr::arrange(curve) %>% 
@@ -110,7 +110,7 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
                                         label_names[x],
                                         "\nVola Change: ",
                                         scales::percent(vol[, x], accuracy = 0.0001),
-                                        "\nSupersector: ",
+                                        "\nSector: ",
                                         sect)
                                })
                                
@@ -126,13 +126,13 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
                                  plotly::layout(annotations = list(text = stringr::str_c("<b>",sect,"</b>"), 
                                                                    font = list(size = 12),
                                                                    xref = "paper",
-                                                                   x = i,
+                                                                   x = -0.4, #i, # i is used to offset sector names to avoid overlapping
                                                                    yref = "paper",
                                                                    y = 0.5,
                                                                    yshift = 0,
                                                                    yanchor = "middle",
                                                                    showarrow = FALSE,
-                                                                   textangle = 270,
+                                                                   textangle = 0, # 270
                                                                    font = list(size = 10,
                                                                                color = "black")
                                                                    ),
@@ -153,10 +153,10 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
                              limit = maxlimit) %>% 
     setNames(unique(sector_list))
   
-print(aspect_vector$height)  
+ 
   ind_subs <- plotly::subplot(
     sector_plots,
-    margin = 0.02, 
+    margin = 0.005, 
     nrows = length(sector_plots),
     heights = aspect_vector$height,
     shareX = TRUE,
