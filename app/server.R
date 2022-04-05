@@ -34,7 +34,7 @@ shinyServer(function(input, output) {
   
   
   # Temprorary Initial load of data Frames
-  mydb <- DBI::dbConnect(RMySQL::MySQL(), user = "ceilert", password = "ceilert", dbname = "fin_data", host = "oben")
+  mydb <- connect_to_DB()
   
   index_mapping <- DBI::dbGetQuery(conn = mydb,
                                    "SELECT ticker_yh,
