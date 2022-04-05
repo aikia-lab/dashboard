@@ -12,7 +12,8 @@ bizdays::load_quantlib_calendars(c('UnitedStates/NYSE'),
                                  financial = TRUE)
 bizdays::create.calendar('UnitedStates/NYSE', financial = TRUE, weekdays = c("saturday", "sunday"))
 
-sapply(as.character(fs::dir_ls(stringr::str_c(here::here(),"/scripts"))), source)
+#sapply(as.character(fs::dir_ls(stringr::str_c(here::here(),"/scripts"))), source)
+sapply(as.character(fs::dir_ls(stringr::str_c(here::here(),"/app/scripts"))), source)
 
 shinyUI(
     
@@ -36,14 +37,14 @@ shinyUI(
                                          tabName = "sector_volas",
                                          expandedName = "sector_vola",
                                          startExpanded = TRUE,
-                                         icon = icon("chart-line")),
-                # 2nd Menu:
-                shinydashboard::menuItem(
-                    strong("Index Entropy"),
-                    expandedName = "index_entropy",
-                    tabName = "index_entropys",
-                    icon = icon("project-diagram")
-                )
+                                         icon = icon("chart-line"))
+           #     # 2nd Menu:
+           #     shinydashboard::menuItem(
+           #         strong("Index Entropy"),
+           #         expandedName = "index_entropy",
+           #         tabName = "index_entropys",
+           #         icon = icon("project-diagram")
+           #     )
             )
         ),
         
@@ -60,27 +61,34 @@ shinyUI(
                                                                                                                                       'US Indices' = 2),
                                                                     not_selected_background = 'grey',
                                                                     selected_background = main_color_light),
-                                    
+                                    # https://jnolis.com/blog/shiny_mobile/
                                     shiny::fluidRow(
-                                        class = "text-center",
-                                        shiny::h3("Sector Volatility Overview"),
-                                        shiny::h4("date to date relative change of volatility levels"),
-                                        
-                                        shiny::div( # wrapping Output in div lets us align it to the right
-                                            plotly::plotlyOutput("sector_vola",
-                                                                 width = "100%",
-                                                                 height = "600px") %>%
-                                                shinycssloaders::withSpinner(type = 8),
-                                            align = "right"
-                                        ),
-                                        br(),
-                                        shiny::div(
-                                            plotly::plotlyOutput("sector_line",
-                                                                 width = "60%",
-                                                                 height = "600px") %>%
-                                                shinycssloaders::withSpinner(type = 8),
-                                            align = "center",
-                                            style = "border-top:1px solid black;"
+                                        shiny::column(
+                                            12,
+                                            class = "col-sm-12",
+                                            shiny::div(class="container-fluid",
+                                                shiny::div(class="text-center text-lg-start",
+                                                    shiny::h3("Sector Volatility Overview"),
+                                                    shiny::h4("date to date relative change of volatility levels")
+                                                )
+                                            ),
+                                            
+                                            shiny::div( # wrapping Output in div lets us align it to the right
+                                                plotly::plotlyOutput("sector_vola",
+                                                                     width = "100%",
+                                                                     height = "600px") %>%
+                                                    shinycssloaders::withSpinner(type = 8),
+                                                align = "right"
+                                            ),
+                                            br(),
+                                            shiny::div(
+                                                plotly::plotlyOutput("sector_line",
+                                                                     width = "60%",
+                                                                     height = "600px") %>%
+                                                    shinycssloaders::withSpinner(type = 8),
+                                                align = "center",
+                                                style = "border-top:1px solid black;"
+                                            )
                                         )
                                     )
             )

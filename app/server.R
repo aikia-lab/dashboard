@@ -56,6 +56,7 @@ shinyServer(function(input, output) {
   sector_vola <- shiny::reactiveVal(NULL)
   
   shiny::observe({
+    
     sector_vola_plotly <- sector_vola_plotly_fun(input$val_date, input$index_location, index_mapping = index_mapping, vola_history = vola_history)
     plotly::event_register(sector_vola_plotly, "plotly_click")
     

@@ -37,11 +37,20 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
   
 #  DBI::dbDisconnect(mydb)
   
+  dates <- format(c(
+    lubridate::as_date(date),
+    bizdays::offset(lubridate::as_date(date), -5,'UnitedStates/NYSE'),
+    bizdays::offset(lubridate::as_date(date),-10,'UnitedStates/NYSE'),
+    bizdays::offset(lubridate::as_date(date),-15,'UnitedStates/NYSE'),
+    bizdays::offset(lubridate::as_date(date),-20,'UnitedStates/NYSE'),
+    bizdays::offset(lubridate::as_date(date),-25,'UnitedStates/NYSE')
+  ), "%Y-%m-%d") 
+  
   location_idx <- index_mapping %>% dplyr::filter(country %in% ifelse(location==1, c("EU","DE"),"US"))# %>% dplyr::pull(ticker_yh)
   
-
   vola_change <- vola_history %>% 
-    dplyr::filter(ticker_yh %in% (location_idx %>% dplyr::pull(ticker_yh))) %>% 
+    dplyr::filter(ticker_yh %in% (location_idx %>% dplyr::pull(ticker_yh)),
+                  date %in% lubridate::as_date(dates)) %>% 
     dplyr::left_join(index_mapping, by = "ticker_yh") %>% 
     dplyr::group_by(ticker_yh) %>%
     dplyr::arrange(desc(date)) %>%
@@ -142,8 +151,7 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
                                                 margin = list(l = 500, # 250
                                                               r = 20, 
                                                               t = 10,
-                                                              b = 100,
-                                                              autoexpand = FALSE)
+                                                              b = 100)
                                                 )
                                
                                return(hm)
@@ -166,7 +174,7 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
   return(ind_subs)
 }
 
-sector_line_chart_fun <- function(index_id, date,index_mapping, vola_history){
+sector_line_chart_fun <- function(index_id, date, index_mapping, vola_history){
   
 
 #  #mydb <- connect_to_DB()
