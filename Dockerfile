@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev \
     libssh2-1-dev \
     libmariadb-dev \
+    libquantlib0-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # libmysqlclient seems to need an update before installing.
@@ -26,9 +27,8 @@ RUN sudo ldconfig
 
 RUN install.r shiny tidyverse forecast jsonlite htmltools DBI \ 
     RMariaDB devtools remotes plotly fs RQuantLib \
-    scales gt shinydashboard bizdays  
+    scales gt shinydashboard bizdays here
     
-RUN Rscript -e "install.packages('RQuantLib')"
 RUN Rscript -e "remotes::install_github('daattali/shinycssloaders')"
 
 RUN echo "local(options(shiny.port = 3838, shiny.host = '0.0.0.0'))" > /usr/lib/R/etc/Rprofile.site
