@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN apt-get update && apt-get install -y libmysqlclient-dev
 
 COPY Rprofile.site /etc/R
+COPY ld.so.conf /etc
 COPY my.cnf /etc
 ENV _R_SHLIB_STRIP_=true
 
