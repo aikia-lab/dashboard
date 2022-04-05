@@ -1,64 +1,95 @@
-#
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+
 
 library(shiny)
-library(DBI)
 library(magrittr)
+library(DBI)
 
-connect_to_DB <- function(mydb, group = "fin_data"){
-  
-  Checkmydb <- tryCatch(DBI::dbIsValid(mydb),
-                        error=function(e) e)
-  if(inherits(Checkmydb, "simpleError")){
-    
-    mydb <- DBI::dbConnect(RMariaDB::MariaDB(), group = group)
-  }
-}
+
 
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
-
-    output$distPlot <- renderPlot({
-
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
-# Financial Sector Plots --------------------------------------------------
-
-        
-
-    })
-
+  
+  
+  
+  ###############################                               
+  #       Update BODY-TABS      #
+  ###############################
+  
+#  observeEvent(input$sidebarItemExpanded, {
+#    if(input$sidebarItemExpanded=="sector_volas"){
+#        updateTabItems(session,"mysidebar","sector_volas")
+#        index_mapping <<- get_index_meta()
+#    }
+#    else if (input$sidebarItemExpanded=="index_entropy")
+#      updateTabItems(session,"mysidebar","index_entropys")
+#    else if (input$sidebarItemExpanded=="score")
+#      updateTabItems(session,"mysidebar","scores")
+#    else if (input$sidebarItemExpanded=="idea")
+#      updateTabItems(session,"mysidebar","ideas")
+#    else if (input$sidebarItemExpanded=="manage")
+#      updateTabItems(session,"mysidebar","manages")
+#  })
+  
+  
+  
+  # Temprorary Initial load of data Frames
+  mydb <- DBI::dbConnect(RMySQL::MySQL(), user = "ceilert", password = "ceilert", dbname = "fin_data", host = "oben")
+  
+  index_mapping <- DBI::dbGetQuery(conn = mydb,
+                                   "SELECT ticker_yh,
+                                   supersector,
+                                   country,
+                                   name
+                                   FROM fin_index_meta_data")
+  
+  vola_history <- DBI::dbGetQuery(conn = mydb,
+                                  stringr::str_c("SELECT *
+                                  FROM v_fin_index_expanded")) %>% 
+    dplyr::mutate(date = lubridate::as_date(date))
+  
+  DBI::dbDisconnect(mydb)
+  
+  
+  # Financial Sector Plots --------------------------------------------------
+  sector_vola <- shiny::reactiveVal(NULL)
+  
+  shiny::observe({
+    sector_vola_plotly <- sector_vola_plotly_fun(input$val_date, input$index_location, index_mapping = index_mapping, vola_history = vola_history)
+    plotly::event_register(sector_vola_plotly, "plotly_click")
     
-    output$db_test <- renderPrint({
-      
-      mydb <- connect_to_DB()
-      
-      print(DBI::dbListTables(mydb))
-      
-      
-    })
+    sector_vola(sector_vola_plotly)
+  })
+  
+  output$sector_vola <- plotly::renderPlotly(expr = {
+    sector_vola()
     
-    output$db_gt <- gt::render_gt({
+  })
+  
+  output$sector_line <- plotly::renderPlotly({
+    click_data <- plotly::event_data("plotly_click") %>%
+      dplyr::as_tibble()
+
+    if(nrow(click_data) != 0){
       
-      mydb <- connect_to_DB()
+      index <- plotly_click_mapping %>%
+        dplyr::filter(curve == click_data[["curveNumber"]],
+                      y == click_data[["y"]]) %>%
+        dplyr::pull(ticker_yh)
       
-      DBI::dbGetQuery(mydb,
-                      "SELECT *
-                      FROM fin_data.v_fin_index_expanded") %>% 
-        gt::gt()
+      sector_line_chart_fun(index_id = index,
+                        date = input$val_date,
+                        index_mapping = index_mapping, 
+                        vola_history = vola_history)
+    } else {
       
-    })
+   #  shiny::HTML("Click on Heatmap Cells for respective Index Chart")
+      
+    }
     
+    # LOAD idx_price_history_global in BACKGROPUND
+  })
+  
+  
+  
 })
-
