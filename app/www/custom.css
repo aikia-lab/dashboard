@@ -25,12 +25,12 @@
 
 .sidebar-menu>li:active>a{
   background-color: #61b7b7!important;
-  border-left-color:#374B9D!important;
+  border-left-color:#E6893C!important;
 }
 
 .li-active{
  background-color: #61b7b7!important;
- border-left-color:#374B9D!important; 
+ border-left-color:#E6893C!important; 
 }
 
 .sidebar-menu .treeview-menu{
@@ -39,7 +39,7 @@
 
 .skin-blue .sidebar-menu>li.active>a, .skin-blue .sidebar-menu>li:hover>a{
   background-color: #61b7b7!important;
-  border-left-color:#374B9D!important;
+  border-left-color:#E6893C!important;
 }
 
 .active{
@@ -51,7 +51,7 @@
 }
 
 .skin-blue .sidebar-menu>li>.treeview-menu{
-  background-color: #374B9D!important;
+  background-color: #E6893C!important;
 }
 
 .skin-blue .treeview-menu>li>a{
