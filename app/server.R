@@ -42,7 +42,10 @@ shinyServer(function(input, output) {
                                    supersector,
                                    country,
                                    name
-                                   FROM fin_index_meta_data")
+                                   FROM fin_index_meta_data") %>% 
+    dplyr::mutate(name = stringr::str_trim(name),
+                  name = stringr::str_remove(name, "STOXX Europe 600 |Dow Jones US |Dow Jones US Total Market |Dow Jones U.S. ")) %>% 
+    dplyr::mutate(name = stringr::str_remove(name, "Total Market "))
   
   vola_history <- DBI::dbGetQuery(conn = mydb,
                                   stringr::str_c("SELECT *
@@ -86,7 +89,7 @@ shinyServer(function(input, output) {
     } else {
      
       validate(
-        need( nrow(click_data) != 0, "Click on Heatmap Cells for Index Price Chart")
+          need( nrow(click_data) != 0, "                  Click on Heatmap Cells for Index Price Chart")
       )
       
     }

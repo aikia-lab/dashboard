@@ -58,11 +58,21 @@ shinyUI(
                 tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
             ),
             
+            tags$head(
+                tags$style(HTML("
+                      .shiny-output-error-validation {
+                        color: #248A8A;
+                        font-weight: bold;
+                        font-size: 150%;
+                      }")
+                )
+            ),
+    
             shinydashboard::tabItem(tabName = "mr_overview",
                                     h2("Market Risk Summary"),
                                     
-                                    shinyThings::radioSwitchButtons(inputId = "index_location", label = NULL, choices = tibble::tibble('EU Indices' = 1,
-                                                                                                                                      'US Indices' = 2),
+                                    shinyThings::radioSwitchButtons(inputId = "index_location", label = NULL, choices = tibble::tibble('US Indices' = 1,
+                                                                                                                                       'EU Indices' = 2),
                                                                     not_selected_background = 'grey',
                                                                     selected_background = main_color_light),
                                     # https://jnolis.com/blog/shiny_mobile/
@@ -72,8 +82,11 @@ shinyUI(
                                             class = "col-sm-12",
                                             shiny::div(class="container-fluid",
                                                 shiny::div(class="text-center text-lg-start",
-                                                    shiny::h3("Sector Volatility Overview"),
-                                                    shiny::h4("date to date relative change of volatility levels")
+                                                           conditionalPanel(condition = 'input.index_location == 2',
+                                                                        shiny::h3("Volatility Overview of 'Stoxx Europe 600' Index Family")), 
+                                                           conditionalPanel(condition = 'input.index_location == 1',
+                                                                        shiny::h3("Volatility Overview of 'Dow Jones US' Index Family")),
+                                                    shiny::h4("date to date relative change of volatility % -levels")
                                                 )
                                             ),
                                             

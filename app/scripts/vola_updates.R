@@ -46,7 +46,8 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
     bizdays::offset(lubridate::as_date(date),-25,'UnitedStates/NYSE')
   ), "%Y-%m-%d") 
   
-  location_idx <- index_mapping %>% dplyr::filter(country %in% ifelse(location==1, c("EU","DE"),"US"))# %>% dplyr::pull(ticker_yh)
+  location_idx <- index_mapping %>% dplyr::filter(country %in% ifelse(location==1, "US", c("EU","DE")))
+  
   
   vola_change <- vola_history %>% 
     dplyr::filter(ticker_yh %in% (location_idx %>% dplyr::pull(ticker_yh)),
@@ -125,33 +126,16 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
                                
                                hm <- heatmaply::heatmaply(
                                  vol,
-                                 colors = colorRampPalette(c('blue','white',"red")),
+                                 colors = colorRampPalette(c('#35ae7b','#f1f1f1','#c9574d')),
                                  hide_colorbar = TRUE,
                                  limits = limit,
                                  label_names = c("Index", "Day:", "Vola Change in %:"),
                                  dendrogram = "none",
                                  plot_method = "plotly",
                                  custom_hovertext = text_mat) %>% 
-                                 plotly::layout(annotations = list(text = stringr::str_c("<b>",sect,"</b>"), 
-                                                                   font = list(size = 12),
-                                                                   xref = "paper",
-                                                                   x = -0.4, #i, # i is used to offset sector names to avoid overlapping
-                                                                   yref = "paper",
-                                                                   y = 0.5,
-                                                                   yshift = 0,
-                                                                   yanchor = "middle",
-                                                                   showarrow = FALSE,
-                                                                   textangle = 0, # 270
-                                                                   font = list(size = 10,
-                                                                               color = "black")
-                                                                   ),
-                                                yaxis = list(title = list(text = " ",
-                                                                          font = list(size = 8),
-                                                                          standoff = 50)),
-                                                margin = list(l = 500, # 250
-                                                              r = 20, 
-                                                              t = 10,
-                                                              b = 100)
+                                 plotly::layout(yaxis = list(title = list(text = " ",
+                                                  font = list(size = 8),
+                                                  standoff = 50))
                                                 )
                                
                                return(hm)
@@ -169,7 +153,17 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
     heights = aspect_vector$height,
     shareX = TRUE,
     shareY = TRUE
+  ) %>% 
+    plotly::layout(annotations = list(
+    list(x = -0.1 , 
+         y = -0.15, 
+         text = "<b>hover over the heatmap for more detailed information</b>",
+         showarrow = F,
+         xref='paper',
+         yref='paper'))
   )
+  
+  
 
   return(ind_subs)
 }
@@ -205,9 +199,9 @@ sector_line_chart_fun <- function(index_id, date, index_mapping, vola_history){
                    hovertemplate = "Index: %{text}<br>Price: %{y:.0}<br>Date: %{x}<extra></extra>",
                    colors = main_color) %>% 
      plotly::layout(xaxis = list(title = "Date",
-                                 range = c(bizdays::offset(lubridate::as_date(date),-50,'UnitedStates/NYSE'),lubridate::as_date(date)),
-                                 rangeselector = list(
-                                   buttons = list(
+                                 range = c(bizdays::offset(lubridate::as_date(date),-50,'UnitedStates/NYSE'),lubridate::as_date(date))),          
+                    rangeselector =  list(
+                         buttons = list(
                                      list(
                                        count = 3,
                                        label = "3 mo",
@@ -228,9 +222,9 @@ sector_line_chart_fun <- function(index_id, date, index_mapping, vola_history){
                                        label = "YTD",
                                        step = "year",
                                        stepmode = "todate"),
-                                     list(step = "all"))),
-                                 rangeslider = list(type = "date")
-                                 ),
+                                     list(step = "all")),
+                         rangeslider = list(type = "date")
+                    ),
                     yaxis = list(title = "Index Level"),
                     title = list(
                       text = stringr::str_c("Index Price and daily Returns for<br>", index_name)
