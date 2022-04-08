@@ -200,7 +200,8 @@ sector_line_chart_fun <- function(index_id, date, index_mapping, vola_history){
                    colors = main_color) %>% 
      plotly::layout(xaxis = list(title = "Date",
                                  range = c(bizdays::offset(lubridate::as_date(date),-50,'UnitedStates/NYSE'),lubridate::as_date(date))),          
-                    rangeselector =  list(
+                    rangeselector =  list( 
+                      y = 0.93,
                          buttons = list(
                                      list(
                                        count = 3,
@@ -242,6 +243,7 @@ sector_line_chart_fun <- function(index_id, date, index_mapping, vola_history){
    plotly::layout(xaxis = list(title = "Date",
                                range = c(bizdays::offset(lubridate::as_date(date),-50,'UnitedStates/NYSE'),lubridate::as_date(date)),
                                rangeselector = list(
+                                 y = 0.93,
                                  buttons = list(
                                    list(
                                      count = 3,
