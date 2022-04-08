@@ -23,7 +23,7 @@ connect_to_DB <- function(mydb, group = "fin_data"){
 
 write_counter_to_sql <- function(){
 
-  tstamp <- tibble::tibble(timestamp = format(lubridate::now(), "%Y-%m-%d %H:%M:%S"))
+  tstamp <- tibble::tibble(timestamp = format(lubridate::now(tzone = "CET"), "%Y-%m-%d %H:%M:%S"))
   
    mydb <- connect_to_DB()
 
