@@ -21,30 +21,21 @@ connect_to_DB <- function(mydb, group = "fin_data"){
 }
 
 
-write_usage_to_sql <- function(data){
-  
-  new_usage <-data.frame(date = lubridate::now(), 
-                         ip = data$ip,
-                         city = data$city,
-                         country = data$country,
-                         loc = data$loc)
-  new_usage <- new_usage %>% dplyr::filter(ip!="217.91.79.198")
-  
-  if(nrow(new_usage)>0){
+write_counter_to_sql <- function(){
 
+  tstamp <- tibble::tibble(timestamp = format(lubridate::now(), "%Y-%m-%d %H:%M:%S"))
+  
    mydb <- connect_to_DB()
 
    DBI::dbWriteTable(mydb, 
                       name= "usage_dashbard", 
-                      value = new_usage, 
+                      value = tstamp, 
                       row.names = FALSE, 
                       header = TRUE,
                       append = TRUE)
     
     DBI::dbDisconnect(mydb)
-  }
-  
-  
+    
 }
 
 

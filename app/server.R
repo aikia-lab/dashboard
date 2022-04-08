@@ -8,18 +8,9 @@ library(DBI)
 
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
-  
+shinyServer(function(input, output, session) {
   
 
-  IP <- reactive({ input$getIP })
-  observe({
-    ip_df <- IP()
-    if(!is.null(ip_df)){
-      write_usage_to_sql(ip_df)
-    }
-  })
-  
   # Temprorary Initial load of data Frames
  
   mydb <- connect_to_DB()
@@ -39,7 +30,11 @@ shinyServer(function(input, output) {
                                   FROM v_fin_index_expanded")) %>% 
     dplyr::mutate(date = lubridate::as_date(date))
   
+  
   DBI::dbDisconnect(mydb)
+  
+  write_counter_to_sql()
+  
   
   
   # Financial Sector Plots --------------------------------------------------
