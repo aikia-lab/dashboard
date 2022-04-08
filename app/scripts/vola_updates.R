@@ -1,6 +1,9 @@
 
 
-sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola_history){
+sector_vola_plotly_fun <- function(date = NULL, 
+                                   location = 1,
+                                   index_mapping, 
+                                   vola_history){
   
 
   #  mydb <- DBI::dbConnect(RMySQL::MySQL(), user = "ceilert", password = "ceilert", dbname = "fin_data", host = "oben")
@@ -44,14 +47,17 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
     bizdays::offset(lubridate::as_date(date),-15,'UnitedStates/NYSE'),
     bizdays::offset(lubridate::as_date(date),-20,'UnitedStates/NYSE'),
     bizdays::offset(lubridate::as_date(date),-25,'UnitedStates/NYSE')
-  ), "%Y-%m-%d") 
+  ), 
+  "%Y-%m-%d") 
   
-  location_idx <- index_mapping %>% dplyr::filter(country %in% ifelse(location==1, "US", c("EU","DE")))
+  location_idx <- index_mapping %>% 
+    dplyr::filter(country %in% ifelse(location==1, "US", c("EU","DE")))
   
   
   vola_change <- vola_history %>% 
-    dplyr::filter(ticker_yh %in% (location_idx %>% dplyr::pull(ticker_yh)),
-                  date %in% lubridate::as_date(dates)) %>% 
+    dplyr::filter(ticker_yh %in% (location_idx %>% 
+                                    dplyr::pull(ticker_yh)),
+                  date %in% lubridate::as_date(dates)) %>%
     dplyr::left_join(index_mapping, by = "ticker_yh") %>% 
     dplyr::group_by(ticker_yh) %>%
     dplyr::arrange(desc(date)) %>%
@@ -60,13 +66,13 @@ sector_vola_plotly_fun <- function(date = NULL, location = 1,index_mapping, vola
     dplyr::filter(date %in% head(unique(date),5)) %>%
     dplyr::mutate(date = forcats::fct_rev(forcats::as_factor(as.character(date))))
     
-  
+  #This is all for correct heatmap output
   limits <- c(sign(min(vola_change$vola_chg[!is.na(vola_change$vola_chg)]))*ceiling(abs(min(vola_change$vola_chg[!is.na(vola_change$vola_chg)]))*200)/200 - 0.001,
               sign(max(vola_change$vola_chg[!is.na(vola_change$vola_chg)]))*ceiling(abs(max(vola_change$vola_chg[!is.na(vola_change$vola_chg)]))*200)/200 - 0.001)
   
   maxlimit <- c(-max(abs(limits)), max(abs(limits)))
   
-  
+  #Create a vector for the different heights of subsector groups in the heatmap
   aspect_vector <- location_idx %>% 
     dplyr::count(supersector) %>% 
     dplyr::filter(supersector != "Bond") %>%

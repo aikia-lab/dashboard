@@ -22,11 +22,16 @@ shinyServer(function(input, output, session) {
                                    name
                                    FROM fin_index_meta_data") %>% 
     dplyr::mutate(name = stringr::str_trim(name),
-                  name = stringr::str_remove(name, "STOXX Europe 600 |Dow Jones US |Dow Jones US Total Market |Dow Jones U.S. ")) %>% 
+                  name = stringr::str_remove(name, 
+                                             "STOXX Europe 600 |
+                                             Dow Jones US |
+                                             Dow Jones US Total Market |
+                                             Dow Jones U.S. ")) %>% 
     dplyr::mutate(name = stringr::str_remove(name, "Total Market "))
   
   vola_history <- DBI::dbGetQuery(conn = mydb,
-                                  stringr::str_c("SELECT *
+                                  stringr::str_c(
+                                    "SELECT *
                                   FROM v_fin_index_expanded")) %>% 
     dplyr::mutate(date = lubridate::as_date(date))
   
@@ -42,7 +47,10 @@ shinyServer(function(input, output, session) {
   
   shiny::observe({
     
-    sector_vola_plotly <- sector_vola_plotly_fun(input$val_date, input$index_location, index_mapping = index_mapping, vola_history = vola_history)
+    sector_vola_plotly <- sector_vola_plotly_fun(input$val_date,
+                                                 input$index_location, 
+                                                 index_mapping = index_mapping, 
+                                                 vola_history = vola_history)
     plotly::event_register(sector_vola_plotly, "plotly_click")
     
     sector_vola(sector_vola_plotly)
@@ -71,7 +79,8 @@ shinyServer(function(input, output, session) {
     } else {
      
       validate(
-          need( nrow(click_data) != 0, "                  Click on Heatmap Cells for Index Price Chart")
+          need(nrow(click_data) != 0, 
+                "                  Click on Heatmap Cells for Index Price Chart")
       )
       
     }

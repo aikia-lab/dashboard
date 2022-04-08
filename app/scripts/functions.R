@@ -8,11 +8,12 @@ connect_to_DB <- function(mydb, group = "fin_data"){
     
     if(Sys.info()[[1]] == "Windows"){ #For testing on Windows
       
-      mydb <- DBI::dbConnect(RMariaDB::MariaDB(), group = group, 
+      mydb <- DBI::dbConnect(RMariaDB::MariaDB(), 
+                             group = group, 
                              default.file = stringr::str_c(here::here(),
                                                            "/my.cnf"))
       
-    } else { #Production on Linux
+    } else { #Production on Linux (No Macs here ;))
       
       mydb <- DBI::dbConnect(RMariaDB::MariaDB(), group = group)
       
@@ -23,7 +24,10 @@ connect_to_DB <- function(mydb, group = "fin_data"){
 
 write_counter_to_sql <- function(){
 
-  tstamp <- tibble::tibble(timestamp = format(lubridate::now(tzone = "CET"), "%Y-%m-%d %H:%M:%S"))
+  tstamp <- tibble::tibble(timestamp = format(
+    lubridate::now(tzone = "CET"), 
+    "%Y-%m-%d %H:%M:%S")
+    )
   
    mydb <- connect_to_DB()
 
