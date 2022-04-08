@@ -25,6 +25,18 @@ shinyUI(
         
         shinydashboard::dashboardHeader(title = "Financial Market Dashboard"),
         
+        metathis::meta() %>%
+          metathis::meta_social(
+            title = "Financial Market Dashboard",
+            description = "analyze the weekly Index volatility change by sector for the US and EU",
+            url = "https://aikia.org/dashboard/",
+            image = "https://aikia.org/images/logo_aikia.png",
+            image_alt = "aikia logo",
+            twitter_card_type = "summary",
+            twitter_site = "@aikia_lab",
+            og_site_name = "https://aikia.org"
+          ),
+        
         # sidebar ----------------------------------------------------------------
         shinydashboard::dashboardSidebar(
             shinydashboard::sidebarMenu(id="mysidebar",
@@ -56,6 +68,11 @@ shinyUI(
         shinydashboard::dashboardBody(
             tags$head(
                 tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
+        #          tags$meta(charset="UTF-8"),
+        #          tags$meta(name="description", content="analyze the weekly Index volatility change by sector for the US and EU"),
+        #          tags$meta(name="keywords", content="data science analysis financial"),
+        #          tags$meta(name="viewport", content="width=device-width, initial-scale=1.0")
+                )
             ),
             
             tags$head(

@@ -32,7 +32,6 @@ shinyServer(function(input, output) {
 #  })
   
   
-  
   IP <- reactive({ input$getIP })
   observe({
     ip_df <- IP()
@@ -40,8 +39,6 @@ shinyServer(function(input, output) {
       write_usage_to_sql(ip_df)
     }
   })
-  
-  
   
   # Temprorary Initial load of data Frames
  

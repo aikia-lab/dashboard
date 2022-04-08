@@ -28,14 +28,18 @@ write_usage_to_sql <- function(data){
                          city = data$city,
                          country = data$country,
                          loc = data$loc)
-  new_usage <- new_usage %>% dplyr::filter(ip != "217.91.79.198")
+  new_usage <- new_usage %>% dplyr::filter(ip!="217.91.79.198")
   
   if(nrow(new_usage)>0){
     
-    mydb <- connect_to_DB()
+    Checkmydb <- tryCatch(DBI::dbIsValid(mydb),
+                          error=function(e) e)
+    if(inherits(Checkmydb, "simpleError")){
+      mydb <- connect_to_DB("217.91.79.198")
+    }
     
     DBI::dbWriteTable(mydb, 
-                      name= "dashboard_usage", 
+                      name= "newshub_usage", 
                       value = new_usage, 
                       row.names = FALSE, 
                       header = TRUE,
@@ -46,9 +50,6 @@ write_usage_to_sql <- function(data){
   
   
 }
-
-
-
 
 
 
