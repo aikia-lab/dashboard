@@ -11,27 +11,7 @@ library(DBI)
 shinyServer(function(input, output) {
   
   
-  
-  ###############################                               
-  #       Update BODY-TABS      #
-  ###############################
-  
-#  observeEvent(input$sidebarItemExpanded, {
-#    if(input$sidebarItemExpanded=="sector_volas"){
-#        updateTabItems(session,"mysidebar","sector_volas")
-#        index_mapping <<- get_index_meta()
-#    }
-#    else if (input$sidebarItemExpanded=="index_entropy")
-#      updateTabItems(session,"mysidebar","index_entropys")
-#    else if (input$sidebarItemExpanded=="score")
-#      updateTabItems(session,"mysidebar","scores")
-#    else if (input$sidebarItemExpanded=="idea")
-#      updateTabItems(session,"mysidebar","ideas")
-#    else if (input$sidebarItemExpanded=="manage")
-#      updateTabItems(session,"mysidebar","manages")
-#  })
-  
-  
+
   IP <- reactive({ input$getIP })
   observe({
     ip_df <- IP()
@@ -100,8 +80,7 @@ shinyServer(function(input, output) {
       )
       
     }
-    
-    # LOAD idx_price_history_global in BACKGROPUND
+
   })
   
   

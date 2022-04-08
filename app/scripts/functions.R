@@ -31,15 +31,11 @@ write_usage_to_sql <- function(data){
   new_usage <- new_usage %>% dplyr::filter(ip!="217.91.79.198")
   
   if(nrow(new_usage)>0){
-    
-    Checkmydb <- tryCatch(DBI::dbIsValid(mydb),
-                          error=function(e) e)
-    if(inherits(Checkmydb, "simpleError")){
-      mydb <- connect_to_DB("217.91.79.198")
-    }
-    
-    DBI::dbWriteTable(mydb, 
-                      name= "newshub_usage", 
+
+   mydb <- connect_to_DB()
+
+   DBI::dbWriteTable(mydb, 
+                      name= "usage_dashbard", 
                       value = new_usage, 
                       row.names = FALSE, 
                       header = TRUE,
