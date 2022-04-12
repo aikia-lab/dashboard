@@ -43,5 +43,11 @@ write_counter_to_sql <- function(){
 }
 
 
-
+get_fed_rates_fun <- function(date1 = NULL, date2 = NULL){
+  
+  
+  
+  
+  
+}
 

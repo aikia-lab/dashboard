@@ -42,7 +42,7 @@ shinyServer(function(input, output, session) {
   
   
   
-  # Financial Sector Plots --------------------------------------------------
+# Financial Sector Plots --------------------------------------------------
   sector_vola <- shiny::reactiveVal(NULL)
   
   shiny::observe({
@@ -87,6 +87,24 @@ shinyServer(function(input, output, session) {
 
   })
   
+
+# FED Funds Rate ----------------------------------------------------------
+  fed_rates <- shiny::reactiveVal(NULL)
   
+  
+  shiny::observe({
+    
+    fed_rates_plotly <- get_fed_rates_fun(input$fed_date_1,
+                                         input$fed_date_2)
+    
+    plotly::event_register(fed_rates_plotly, "plotly_click")
+    
+    fed_rates(fed_rates_plotly)
+    
+  })
+  
+  output$fed_rates <- plotly::renderPlotly({
+    fed_rates()
+  })
   
 })

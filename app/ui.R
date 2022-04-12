@@ -48,18 +48,17 @@ shinyUI(
                                  ),
                                  format = "dd.mm.yyyy"),
                 # 1st Menu:
-                shinydashboard::menuItem("Market Vola",
+                shinydashboard::menuItem(strong("Market Volatility"),
                                          tabName = "sector_volas",
                                          expandedName = "sector_vola",
                                          startExpanded = TRUE,
-                                         icon = icon("chart-line"))
-           #     # 2nd Menu:
-           #     shinydashboard::menuItem(
-           #         strong("Index Entropy"),
-           #         expandedName = "index_entropy",
-           #         tabName = "index_entropys",
-           #         icon = icon("project-diagram")
-           #     )
+                                         icon = icon("chart-line")),
+                # 2nd Menu:
+                shinydashboard::menuItem(strong("FED Funds Rate"),
+                                         expandedName = "index_entropy",
+                                         tabName = "index_entropys",
+                                         icon = icon("project-diagram")
+                )
             )
         ),
         
@@ -69,10 +68,6 @@ shinyUI(
                 tags$link(rel = "stylesheet", 
                           type = "text/css", 
                           href = "custom.css")
-        #          tags$meta(charset="UTF-8"),
-        #          tags$meta(name="description", content="analyze the weekly Index volatility change by sector for the US and EU"),
-        #          tags$meta(name="keywords", content="data science analysis financial"),
-        #          tags$meta(name="viewport", content="width=device-width, initial-scale=1.0")
             ),
         
         # Website metadata for eg link preview
@@ -98,7 +93,8 @@ shinyUI(
                       }")
                 )
             ),
-    
+            
+            # Market Volatility Overview
             shinydashboard::tabItem(tabName = "mr_overview",
                                     h2("Market Risk Summary"),
                                     
@@ -151,6 +147,34 @@ shinyUI(
                                                       style = "border-top:1px solid black;"
                                                     )
                                         )
+                                    )
+            ),
+        
+            # FED FUNDS Rate
+            shinydashboard::tabItem(tabName = "fed_funds",
+                                    h2("Fed Funds Rates"),
+                                  
+                                    shiny::fluidRow(
+                                      shiny::h3("Market Forward Curve Expectaion"),
+                                      
+                                      # Select 1st Date
+                                      shiny::dateInput(inputId = "fed_date_1",
+                                                       label = "Select Valuation Date for 1st Curve",
+                                                       value = lubridate::as_date(
+                                                         bizdays::offset(lubridate::today(), 
+                                                                         -1,
+                                                                         'UnitedStates/NYSE')
+                                                       ),
+                                                       format = "dd.mm.yyyy"),
+                                      
+                                      # Select 2nd Date
+                                      shiny::dateInput(inputId = "fed_date_2",
+                                                       label = "Select Valuation Date for 1st Curve",
+                                                       value = NULL,
+                                                       format = "dd.mm.yyyy"),
+                                      
+                                      plotly::plotlyOutput("fed_rates") %>%
+                                        shinycssloaders::withSpinner() # spinner options oben global noch einsetzen !!!!!!!!!!!!!!!!!!!!!!!!! 
                                     )
             )
         )
