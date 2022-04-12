@@ -11,6 +11,9 @@ bizdays::create.calendar(
   weekdays = c("saturday", "sunday")
 )
 
+options(spinner.color = main_color,
+        spinner.type = 8)
+
 if(Sys.info()[[1]] == "Windows"){ #For testing on Windows
   sapply(as.character(fs::dir_ls(
     stringr::str_c(here::here(), "/app/scripts")
@@ -122,7 +125,7 @@ shinyUI(
                                                       plotly::plotlyOutput("sector_vola",
                                                                            width = "100%",
                                                                            height = "600px") %>%
-                                                        shinycssloaders::withSpinner(type = 8),
+                                                        shinycssloaders::withSpinner(),
                                                       align = "right"
                                                     ),
                                                     br(),
@@ -132,7 +135,7 @@ shinyUI(
                                                       plotly::plotlyOutput("sector_line",
                                                                            width = "90%",
                                                                            height = "600px") %>%
-                                                        shinycssloaders::withSpinner(type = 8),
+                                                        shinycssloaders::withSpinner(),
                                                       align = "center",
                                                       style = "border-top:1px solid black;"
                                                     )
@@ -148,26 +151,39 @@ shinyUI(
                                     h2("Fed Funds Rates"),
                                   
                                     shiny::fluidRow(
-                                      shiny::h3("Market Forward Curve Expectaion"),
+                                      shiny::h3("Market Forward Curve Expectation"),
                                       
+                                      shiny::column(width = 2,
                                       # Select 1st Date
                                       shiny::dateInput(inputId = "fed_date_1",
                                                        label = "Select Valuation Date for 1st Curve",
                                                        value = lubridate::as_date(
-                                                         bizdays::offset(lubridate::today(), 
+                                                         bizdays::offset(lubridate::today(),
                                                                          -1,
                                                                          'UnitedStates/NYSE')
                                                        ),
-                                                       format = "dd.mm.yyyy"),
+                                                       format = "dd.mm.yyyy",
+                                                       daysofweekdisabled = c(5,6))
+                                      ),
                                       
+                                      shiny::column(width = 2,
                                       # Select 2nd Date
                                       shiny::dateInput(inputId = "fed_date_2",
-                                                       label = "Select Valuation Date for 1st Curve",
-                                                       value = NULL,
-                                                       format = "dd.mm.yyyy"),
+                                                       label = "Select Valuation Date for 2nd Curve",
+                                                       value = lubridate::as_date(
+                                                         bizdays::offset(lubridate::today(), 
+                                                                         -2,
+                                                                         'UnitedStates/NYSE')
+                                                       ),
+                                                       format = "dd.mm.yyyy",
+                                                       daysofweekdisabled = c(5,6))
+                                      )
+                                      ),
+                                    shiny::fluidRow(
                                       
                                       plotly::plotlyOutput("fed_rates") %>%
-                                        shinycssloaders::withSpinner() # spinner options oben global noch einsetzen !!!!!!!!!!!!!!!!!!!!!!!!! 
+                                        shinycssloaders::withSpinner(),
+                                      "Note: 1 hike = 25bps rate step"
                                     )
             )
         )
