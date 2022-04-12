@@ -35,30 +35,26 @@ shinyUI(
         
         # sidebar ----------------------------------------------------------------
         shinydashboard::dashboardSidebar(
-          shinydashboard::sidebarMenu(id = "mysidebar",
-                                      shiny::imageOutput("picture", 
-                                                         height  = "auto"),
-            
-                shiny::dateInput(inputId = "val_date",
-                                 label = "Select Valuation Date",
-                                 value = lubridate::as_date(
-                                     bizdays::offset(lubridate::today(), 
-                                                     -1,
-                                                     'UnitedStates/NYSE')
-                                 ),
-                                 format = "dd.mm.yyyy"),
+          shinydashboard::sidebarMenu(
+            id = "mysidebar",
+            shiny::imageOutput("picture",
+                               height  = "auto"),
+            shiny::dateInput(inputId = "val_date",
+                             label = "Select Valuation Date",
+                             value = lubridate::as_date(
+                               bizdays::offset(lubridate::today(),
+                                               -1,
+                                               'UnitedStates/NYSE')
+                               ),
+                             format = "dd.mm.yyyy"),
                 # 1st Menu:
                 shinydashboard::menuItem(strong("Market Volatility"),
                                          tabName = "sector_volas",
-                                         expandedName = "sector_vola",
-                                         startExpanded = TRUE,
                                          icon = icon("chart-line")),
                 # 2nd Menu:
                 shinydashboard::menuItem(strong("FED Funds Rate"),
-                                         expandedName = "index_entropy",
-                                         tabName = "index_entropys",
-                                         icon = icon("project-diagram")
-                )
+                                         tabName = "fed_funds",
+                                         icon = icon("project-diagram"))
             )
         ),
         
@@ -95,7 +91,7 @@ shinyUI(
             ),
             
             # Market Volatility Overview
-            shinydashboard::tabItem(tabName = "mr_overview",
+            shinydashboard::tabItem(tabName = "sector_volas",
                                     h2("Market Risk Summary"),
                                     
                                     shinyThings::radioSwitchButtons(

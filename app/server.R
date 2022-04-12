@@ -97,6 +97,7 @@ shinyServer(function(input, output, session) {
     fed_rates_plotly <- get_fed_rates_fun(input$fed_date_1,
                                          input$fed_date_2)
     
+    fed_rates_plotly
     plotly::event_register(fed_rates_plotly, "plotly_click")
     
     fed_rates(fed_rates_plotly)

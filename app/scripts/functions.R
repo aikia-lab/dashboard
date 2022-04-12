@@ -45,9 +45,45 @@ write_counter_to_sql <- function(){
 
 get_fed_rates_fun <- function(date1 = NULL, date2 = NULL){
   
+  mydb <- connect_to_DB()
   
+  if(!is.null(date1)){
+  fed_curve_date1 <- DBI::dbGetQuery(mydb,
+                  stringr::str_c(
+                    "SELECT * 
+                  FROM fin_data.eco_fed_funds_rate
+                  WHERE retrieval_date = '",date1,"'"))  
+  }
   
+  if(!is.null(date2)){
+  fed_curve_date2 <- DBI::dbGetQuery(mydb,
+                                     stringr::str_c(
+                                       "SELECT * 
+                  FROM fin_data.eco_fed_funds_rate
+                  WHERE retrieval_date = '",date2,"'"))  
+  }
+
+  fed_plotly <- plotly::plot_ly(
+    data = fed_curve_date1,
+    x = ~meeting_date,
+    y = ~no.steps,
+    type = "scatter",
+    mode = "lines+markers")
   
+  if(!is.null(date2)) {
+    
+    fed_plotly <- fed_plotly %>% 
+      plotly::add_trace(
+      data = fed_curve_date2,
+      x = ~meeting_date,
+      y = ~no.steps,
+      type = "scatter",
+      mode = "lines+markers")
+    
+  }
+  
+  DBI::dbDisconnect(mydb)
+  return(fed_plotly)
   
 }
 
