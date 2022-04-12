@@ -1,15 +1,10 @@
 
-
-
-
-
-
 library(shiny)
 library(magrittr)
 
-bizdays::load_quantlib_calendars(c('UnitedStates/NYSE'),
+suppressMessages(bizdays::load_quantlib_calendars(c('UnitedStates/NYSE'),
                                  from='2016-01-01', to=lubridate::today(),
-                                 financial = TRUE)
+                                 financial = TRUE))
 bizdays::create.calendar(
   'UnitedStates/NYSE',
   financial = TRUE,
@@ -63,7 +58,14 @@ shinyUI(
             tags$head(
                 tags$link(rel = "stylesheet", 
                           type = "text/css", 
-                          href = "custom.css")
+                          href = "custom.css"),
+                tags$style(HTML("
+                      .shiny-output-error-validation {
+                        color: #248A8A;
+                        font-weight: bold;
+                        font-size: 150%;
+                      }")
+                )
             ),
         
         # Website metadata for eg link preview
@@ -78,19 +80,11 @@ shinyUI(
                 twitter_site = "@aikia_lab",
                 og_site_name = "https://aikia.org"
             ),
-        
-        
-            tags$head(
-                tags$style(HTML("
-                      .shiny-output-error-validation {
-                        color: #248A8A;
-                        font-weight: bold;
-                        font-size: 150%;
-                      }")
-                )
-            ),
-            
-            # Market Volatility Overview
+
+
+# Market Volatility Overview ----------------------------------------------
+
+ shinydashboard::tabItems(
             shinydashboard::tabItem(tabName = "sector_volas",
                                     h2("Market Risk Summary"),
                                     
@@ -146,7 +140,10 @@ shinyUI(
                                     )
             ),
         
-            # FED FUNDS Rate
+
+# FED Funds Rate ----------------------------------------------------------
+
+
             shinydashboard::tabItem(tabName = "fed_funds",
                                     h2("Fed Funds Rates"),
                                   
@@ -175,6 +172,7 @@ shinyUI(
             )
         )
     )
+)
 )
 
 
