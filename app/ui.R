@@ -163,7 +163,7 @@ shinyUI(
                                                                          'UnitedStates/NYSE')
                                                        ),
                                                        format = "dd.mm.yyyy",
-                                                       daysofweekdisabled = c(5,6))
+                                                       daysofweekdisabled = c(0,6))
                                       ),
                                       
                                       shiny::column(width = 2,
@@ -176,7 +176,7 @@ shinyUI(
                                                                          'UnitedStates/NYSE')
                                                        ),
                                                        format = "dd.mm.yyyy",
-                                                       daysofweekdisabled = c(5,6))
+                                                       daysofweekdisabled = c(0,6))
                                       )
                                       ),
                                     shiny::fluidRow(
@@ -184,6 +184,11 @@ shinyUI(
                                       plotly::plotlyOutput("fed_rates") %>%
                                         shinycssloaders::withSpinner(),
                                       "Note: 1 hike = 25bps rate step"
+                                    ),
+                                    br(), br(),
+                                    shiny::fluidRow(
+                                      h3("History of meeting date sensitivities")
+                                      
                                     )
             )
         )
