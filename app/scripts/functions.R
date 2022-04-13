@@ -22,6 +22,21 @@ connect_to_DB <- function(mydb, group = "fin_data"){
 }
 
 
+get_fed_meeting_dates <- function(){
+  
+  mydb <- connect_to_DB()
+  fed_meeting_dates <- DBI::dbGetQuery(mydb, "SELECT
+                                       DISTINCT(meeting_date) AS meeting_date
+                                       FROM fin_data.eco_fed_funds_rate") %>% 
+    dplyr::filter(meeting_date >= lubridate::today()) %>% 
+    dplyr::pull(meeting_date)
+  
+  DBI::dbDisconnect(mydb)
+  
+  return(fed_meeting_dates)
+}
+
+
 write_counter_to_sql <- function(){
 
   tstamp <- tibble::tibble(timestamp = format(
@@ -131,26 +146,76 @@ get_fed_rates_fun <- function(date1 = NULL, date2 = NULL){
 }
 
 
-#meeting_data <- function(meeting_date = NULL){
-#
-#mydb <- connect_to_DB()
-#
-#meeting <- DBI::dbGetQuery(
-#  mydb,
-#  stringr::str_c(
-#    "SELECT *
-#      FROM fin_data.eco_fed_funds_rate AS effr
-#      WHERE meeting_date = '",meeting_date,"'"
-#  )
-#)
-#plotly::plot_ly(data = dec_meeting,
-#                x = ~date,
-#                y = ~p_change,
-#                type = "scatter",
-#                mode = "lines")
-#
-#DBI::dbDisconnect(mydb)
-#return(meeting)
-#}
+meeting_data <- function(act_meeting_date = NULL){
+
+
+  mydb <- connect_to_DB()
+  
+  meeting <- DBI::dbGetQuery(
+    mydb,
+    stringr::str_c(
+      "SELECT *
+        FROM fin_data.eco_fed_funds_rate AS effr
+        WHERE meeting_date = '",act_meeting_date,"'"
+    )
+  ) %>%
+  dplyr::as_tibble() %>% 
+  dplyr::mutate(p_nochange = ifelse(p_nochange < 0, 0, p_nochange)) %>% 
+  dplyr::arrange(date) %>% 
+  dplyr::select(date,
+                "Rate change probability" = p_change,
+                "No rate change probability" = p_nochange,
+                "Implied rate" = impl.rate,
+                "No. of expected steps" = no.steps) %>% 
+    tidyr::pivot_longer(-date,
+                        names_to = "symbols",
+                        values_to = "values")
+  
+  
+  DBI::dbDisconnect(mydb)
+
+  # helper function for plotly update
+  getbuttons <- function(symbols){
+    
+    list(method = "restyle",
+         args = list("transforms[0].value", symbols),
+         label = symbols)
+    
+  }
+  
+  buttons_filter <- purrr::map(unique(meeting$symbols), getbuttons)
+  
+  
+  meeting_plotly <- plotly::plot_ly(data = meeting,
+                  x = ~date,
+                  y = ~values,
+                  type = "scatter",
+                  mode = "lines",
+                  hovertemplate = "Date:%{x}<br>Value:%{y:.2f} <extra></extra>",
+                  line = list(
+                    color = palette_main[4]),
+                  transforms = list(
+                    list(
+                      type = 'filter',
+                      target = ~symbols,
+                      operation = 'in',
+                      value = unique(meeting$symbols)[1]))
+                  ) %>%
+    plotly::layout(xaxis = list(title = "Date",
+                                rangeslider = list(visible = F)),
+                   updatemenus = list(
+                     list(
+                       y = 1.1,
+                       x = 0.1,
+                       type = "dropdown",
+                       active = 0,
+                       buttons = buttons_filter
+                     )
+                   )
+    )
+
+  
+  return(meeting_plotly)
+}
 
 

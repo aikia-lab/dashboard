@@ -34,11 +34,43 @@ shinyServer(function(input, output, session) {
                                     "SELECT *
                                   FROM v_fin_index_expanded")) %>% 
     dplyr::mutate(date = lubridate::as_date(date))
-  
-  
+
+
   DBI::dbDisconnect(mydb)
   
-  write_counter_to_sql()
+#  write_counter_to_sql()
+  
+
+# Resizing aikia logo -----------------------------------------------------
+  
+  # reactive value 4 sidebar collapsing
+  vals<-reactiveValues()
+  vals$collapsed=FALSE
+  observeEvent(input$SideBar_col_react,{
+    vals$collapsed=!vals$collapsed
+  })
+  
+  # reactive logo   
+  size <- reactive({
+    if(vals$collapsed){
+      return("50px") 
+    } else {
+      return("120px")
+    }
+  }) 
+  
+
+  
+  output$picture <- shiny::renderImage({
+    
+    return(list(src = "C:/Users/admin/Documents/dashboard/app/www/aikia_logo.svg", 
+                contentType = "image/svg+xml", 
+                width = size(),
+                height = size(),
+                alt = "Analytics")) #style = 'position: absolute; left: 50%; transform: translateX(-50%);'
+    
+  },
+  deleteFile = FALSE) 
   
   
   
@@ -90,22 +122,34 @@ shinyServer(function(input, output, session) {
 
 # FED Funds Rate ----------------------------------------------------------
   fed_rates <- shiny::reactiveVal(NULL)
+  meeting_date <- shiny::reactiveVal(NULL)
   
-  
+  # Reactive Value for Fed Funds Curve
   shiny::observe({
-    
     fed_rates_plotly <- get_fed_rates_fun(input$fed_date_1,
                                          input$fed_date_2)
-    
-    fed_rates_plotly
     plotly::event_register(fed_rates_plotly, "plotly_click")
     
     fed_rates(fed_rates_plotly)
-    
   })
   
+  # Reactive Value for Meeting Date Variables
+  shiny::observe({
+    meeting_plotly <- meeting_data(input$meeting_d)
+    plotly::event_register(meeting_plotly, "plotly_click")
+    
+    meeting_date(meeting_plotly)
+  })
+  
+  # Output for Fed Funds Curve
   output$fed_rates <- plotly::renderPlotly({
     fed_rates()
   })
+  
+  # Output for Meeting Date variables
+  output$meeting_date <- plotly::renderPlotly({
+    meeting_date()
+  })
+  
   
 })

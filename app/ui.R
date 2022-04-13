@@ -11,8 +11,6 @@ bizdays::create.calendar(
   weekdays = c("saturday", "sunday")
 )
 
-options(spinner.color = main_color,
-        spinner.type = 8)
 
 if(Sys.info()[[1]] == "Windows"){ #For testing on Windows
   sapply(as.character(fs::dir_ls(
@@ -25,26 +23,46 @@ if(Sys.info()[[1]] == "Windows"){ #For testing on Windows
     }
 
 
+options(spinner.color = main_color,
+        spinner.type = 8)
+
+
 shinyUI(
-    
-    shinydashboard::dashboardPage(
-        
-        shinydashboard::dashboardHeader(title = "Financial Market Dashboard"),
+   
+    shinydashboardPlus::dashboardPage(     
+      shinydashboardPlus::dashboardHeader(
+        title = HTML(glue::glue(
+            '<span class="logo-mini"><em>m</em><strong>d</strong></span>
+           <span class="logo-lg"><em>market </em><strong>dashboard</strong></span>'
+        )), 
+        leftUi = tagList(
+                  shiny::dateInput(inputId = "val_date",
+                                   label = "Select Valuation Date",
+                                   value = lubridate::as_date(
+                                     bizdays::offset(lubridate::today(),
+                                                     -1,
+                                                     'UnitedStates/NYSE')
+                                   ),
+                                   format = "dd.mm.yyyy",
+                                   daysofweekdisabled = c(0,6))
+                  )
+          ),
+            
         
         # sidebar ----------------------------------------------------------------
-        shinydashboard::dashboardSidebar(
+        
+        shinydashboardPlus::dashboardSidebar(
+        # workaround for reactive sidebar collapsing        
+          tags$script("$(document).on('click', '.sidebar-toggle', function () {
+                      Shiny.onInputChange('SideBar_col_react', Math.random())});"),
+      
           shinydashboard::sidebarMenu(
             id = "mysidebar",
-            shiny::imageOutput("picture",
-                               height  = "auto"),
-            shiny::dateInput(inputId = "val_date",
-                             label = "Select Valuation Date",
-                             value = lubridate::as_date(
-                               bizdays::offset(lubridate::today(),
-                                               -1,
-                                               'UnitedStates/NYSE')
-                               ),
-                             format = "dd.mm.yyyy"),
+            
+            br(),
+            shiny::imageOutput("picture", height  = "auto"),
+            br(),
+
                 # 1st Menu:
                 shinydashboard::menuItem(strong("Market Volatility"),
                                          tabName = "sector_volas",
@@ -163,6 +181,7 @@ shinyUI(
                                                                          'UnitedStates/NYSE')
                                                        ),
                                                        format = "dd.mm.yyyy",
+                                                       min = "2022-02-14",
                                                        daysofweekdisabled = c(0,6))
                                       ),
                                       
@@ -176,6 +195,7 @@ shinyUI(
                                                                          'UnitedStates/NYSE')
                                                        ),
                                                        format = "dd.mm.yyyy",
+                                                       min = "2022-02-14",
                                                        daysofweekdisabled = c(0,6))
                                       )
                                       ),
@@ -187,8 +207,17 @@ shinyUI(
                                     ),
                                     br(), br(),
                                     shiny::fluidRow(
-                                      h3("History of meeting date sensitivities")
+                                      h3("History of meeting date sensitivities"),
                                       
+                                      shiny::column(width = 2,
+                                        shiny::selectInput("meeting_d", "Select Meeting Date", 
+                                                         choices = get_fed_meeting_dates())
+                                      ),
+                                      br(), br(),br(), br(),
+                                      plotly::plotlyOutput("meeting_date",
+                                                           width = "90%") %>%
+                                        shinycssloaders::withSpinner(),
+                                      br(), br(),
                                     )
             )
         )
