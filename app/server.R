@@ -63,7 +63,7 @@ shinyServer(function(input, output, session) {
   
   output$picture <- shiny::renderImage({
     
-    return(list(src = "C:/Users/admin/Documents/dashboard/app/www/aikia_logo.svg", 
+    return(list(src = "www/aikia_logo.svg", 
                 contentType = "image/svg+xml", 
                 width = size(),
                 height = size(),
