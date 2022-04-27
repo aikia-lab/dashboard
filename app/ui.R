@@ -13,6 +13,7 @@ bizdays::create.calendar(
 
 
 if(Sys.info()[[1]] == "Windows"){ #For testing on Windows
+
   sapply(as.character(fs::dir_ls(
     stringr::str_c(here::here(), "/app/scripts")
   )), source)
@@ -70,6 +71,11 @@ shinyUI(
                 # 2nd Menu:
                 shinydashboard::menuItem(strong("FED Funds Rate"),
                                          tabName = "fed_funds",
+                                         icon = icon("project-diagram")),
+            
+                # 3rd Menu:
+                shinydashboard::menuItem(strong("Index Entropy"),
+                                         tabName = "idx_entro",
                                          icon = icon("project-diagram"))
             )
         ),
@@ -219,10 +225,40 @@ shinyUI(
                                         shinycssloaders::withSpinner(),
                                       br(), br(),
                                     )
+            ),
+
+# Index Entropy ----------------------------------------------------------
+
+
+            shinydashboard::tabItem(tabName = "idx_entro",
+                                    h2("Index Entropy via Network Graph"),
+                                    
+                                        shiny::fluidRow(
+                                          shiny::h3("identify structural order via correlation limits"),
+                                          
+                                          shiny::column(width = 2,
+                                                        shiny::selectInput("choose_idx", "Select Market Index", 
+                                                                           choices = get_available_indices())
+                                          )
+                                        ),
+                                        br(), br(),br(), br(),
+                                          
+                                        shiny::column(width = 6,
+                                          plotly::plotlyOutput("idx_entrop") %>%
+                                            shinycssloaders::withSpinner()
+                                        ),
+                                        shiny::column(width = 6,
+                                          plotly::plotlyOutput("date_entropy") %>%
+                                            shinycssloaders::withSpinner()
+                                        )
+                                      
+                                    
+                                    )
+            
             )
         )
     )
 )
-)
+
 
 

@@ -38,7 +38,17 @@ shinyServer(function(input, output, session) {
 
   DBI::dbDisconnect(mydb)
   
-  write_counter_to_sql()
+
+  shiny::updateDateInput(
+          session, 
+          "val_date",
+          value = lubridate::as_date(
+                    bizdays::offset(lubridate::today(),
+                            -1,
+                            'UnitedStates/NYSE'))
+  )
+  
+#  write_counter_to_sql()
   
 
 # Resizing aikia logo -----------------------------------------------------
@@ -152,4 +162,76 @@ shinyServer(function(input, output, session) {
   })
   
   
+  
+# Index Entropy ----------------------------------------------------------
+  get_idx_entropy <- shiny::reactiveVal(NULL)
+  
+  
+  # Reactive Value for Fed Funds Curve
+  shiny::observe({
+    entropy_pnl_plotly <- entr_pnl_plotly_fun(input$val_date,
+                                              input$choose_idx)
+    plotly::event_register(entropy_pnl_plotly, "plotly_click")
+    
+    if(exists("click_data")){rm(click_data)}
+    
+    get_idx_entropy(entropy_pnl_plotly)
+  })
+  
+
+  
+  
+  # Output for Index Timeline
+  output$idx_entrop <- plotly::renderPlotly({
+    get_idx_entropy()
+  })
+  
+  
+  
+  output$date_entropy <- plotly::renderPlotly({
+    
+    click_data <<- plotly::event_data("plotly_click") %>%
+      dplyr::as_tibble()
+   
+    if(nrow(click_data) != 0){
+      
+      new_date <- click_data %>% 
+        dplyr::filter(y == click_data[["y"]]) %>%
+        dplyr::pull(x)
+    
+      entrop_tic_group_fun(start_date = new_date, 
+                           cur_idx = input$choose_idx, 
+                           corr_th = 0.7)
+    } else {
+      
+      validate(
+        need(nrow(click_data) != 0, 
+             "                  Click on History Plot for Entropy Calculation")
+      )
+      
+    }
+    
+  })
+
+  
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
