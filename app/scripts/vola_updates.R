@@ -106,7 +106,7 @@ sector_vola_plotly_fun <- function(date = NULL,
                                i <- i %>% 
                                  dplyr::filter(supersector == sect) %>% 
                                  dplyr::pull(i)
-                               
+
                                vol <- data %>% 
                                  dplyr::filter(supersector == sect) %>% 
                                  dplyr::ungroup() %>% 

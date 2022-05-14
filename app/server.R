@@ -1,6 +1,7 @@
 
 
 library(shiny)
+library(shinyBS)
 library(magrittr)
 library(DBI)
 
@@ -29,13 +30,38 @@ shinyServer(function(input, output, session) {
                                              Dow Jones U.S. ")) %>% 
     dplyr::mutate(name = stringr::str_remove(name, "Total Market "))
   
+  ticker_mapping <- DBI::dbGetQuery(conn = mydb,
+                                   "SELECT 
+                                    ticker_yh,
+                                    name ,
+                                    industry_group,
+                                    bics_level_1_sector_name,
+                                    bics_level_2_industry_group_name
+                                   FROM fin_ticker_meta_data") %>% 
+    dplyr::rename(BIC_1 = bics_level_1_sector_name,
+                  BIC_2 = bics_level_2_industry_group_name)
+  
   vola_history <- DBI::dbGetQuery(conn = mydb,
                                   stringr::str_c(
                                     "SELECT *
                                   FROM v_fin_index_expanded")) %>% 
     dplyr::mutate(date = lubridate::as_date(date))
-
-
+  
+  
+  # Get IDX TIC Relation
+  idx_tic_relation <- DBI::dbGetQuery(mydb, "SELECT * 
+                                           FROM fin_ticker_index_relation") %>% # get ISINs for indices 
+    dplyr::as_tibble()
+  
+  tic_meta <- DBI::dbGetQuery(mydb, "SELECT isin, ticker_yh 
+                                   FROM fin_ticker_meta_data") %>%  # get ticker_yh for ISINs
+    dplyr::as_tibble()
+  
+  idx_tic_rel <<- dplyr::left_join(idx_tic_relation, tic_meta, by = "isin") %>% # get ticker_yh for indices
+    dplyr::as_tibble()
+  #  --- --- --- --- --- --- --- --- ---
+  
+  
   DBI::dbDisconnect(mydb)
   
 
@@ -166,10 +192,9 @@ shinyServer(function(input, output, session) {
 # Index Entropy ----------------------------------------------------------
   get_idx_entropy <- shiny::reactiveVal(NULL)
   
-  
   # Reactive Value for Fed Funds Curve
   shiny::observe({
-    entropy_pnl_plotly <- entr_pnl_plotly_fun(input$val_date,
+    entropy_pnl_plotly <- entropy_pnl_fun(input$val_date,
                                               input$choose_idx)
     plotly::event_register(entropy_pnl_plotly, "plotly_click")
     
@@ -187,12 +212,12 @@ shinyServer(function(input, output, session) {
   })
   
   
-  
+  # Output Correlation Network
   output$date_entropy <- plotly::renderPlotly({
     
     click_data <<- plotly::event_data("plotly_click") %>%
       dplyr::as_tibble()
-   
+    
     if(nrow(click_data) != 0){
       
       new_date <- click_data %>% 
@@ -201,7 +226,9 @@ shinyServer(function(input, output, session) {
     
       entrop_tic_group_fun(start_date = new_date, 
                            cur_idx = input$choose_idx, 
-                           corr_th = 0.7)
+                           corr_th = input$choose_entropy_th,
+                           sector_info = ticker_mapping,
+                           grouping = input$choose_grouping)
     } else {
       
       validate(

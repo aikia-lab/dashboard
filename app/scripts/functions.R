@@ -22,6 +22,12 @@ connect_to_DB <- function(mydb, group = "fin_data"){
 }
 
 
+date_seq_fun <- function(ticker,end_date_fun,start_date_fun){
+  date_seq <- tibble::tibble(date = bizdays::bizseq(end_date_fun, start_date_fun, 'UnitedStates/NYSE'),
+                             ticker_yh = ticker)
+} 
+
+
 get_fed_meeting_dates <- function(){
   
   mydb <- connect_to_DB()
@@ -35,23 +41,6 @@ get_fed_meeting_dates <- function(){
   
   return(fed_meeting_dates)
 }
-
-
-get_available_indices <- function(){
-  
-  mydb <- connect_to_DB()
-  
-  get_indices <- DBI::dbGetQuery(mydb, "SELECT 
-                                       DISTINCT(ticker_yh) AS indices
-                                       FROM fin_index_history") %>%
-    dplyr::pull(indices)
-  
-  DBI::dbDisconnect(mydb)
-  
-  return(get_indices)
-  
-}
-
 
 
 write_counter_to_sql <- function(){
@@ -80,7 +69,7 @@ get_fed_rates_fun <- function(date1 = NULL, date2 = NULL){
   mydb <- connect_to_DB()
   
   if(!is.null(date1)){
-  fed_curve_date1 <- DBI::dbGetQuery(mydb,
+  fed_curve_date1 <<- DBI::dbGetQuery(mydb,
                   stringr::str_c(
                     "SELECT * 
                   FROM fin_data.eco_fed_funds_rate
@@ -88,7 +77,7 @@ get_fed_rates_fun <- function(date1 = NULL, date2 = NULL){
   }
   
   if(!is.null(date2)){
-  fed_curve_date2 <- DBI::dbGetQuery(mydb,
+  fed_curve_date2 <<- DBI::dbGetQuery(mydb,
                                      stringr::str_c(
                                        "SELECT * 
                   FROM fin_data.eco_fed_funds_rate
@@ -237,12 +226,11 @@ meeting_data <- function(act_meeting_date = NULL){
 
 
 
-entr_pnl_plotly_fun <- function(valuation_date, index){
+entropy_pnl_fun <- function(valuation_date, index){
     
   
   date_hist <- bizdays::offset(lubridate::today(), -200, 'UnitedStates/NYSE')
-  
-  
+
   mydb <- connect_to_DB()
   
   index_hist <- DBI::dbGetQuery(mydb, paste0("SELECT * 
@@ -252,7 +240,7 @@ entr_pnl_plotly_fun <- function(valuation_date, index){
                          AND ticker_yh = '", index,"'"))
   
   entropy_hist <- DBI::dbGetQuery(mydb, paste0("SELECT * 
-                         FROM fin_index_entropy_history
+                         FROM fin_index_entropy_history_3
                          WHERE date <= '", valuation_date,"'
                          AND date > '", date_hist, "'
                          AND indices = '", index,"'"))
@@ -268,8 +256,8 @@ entr_pnl_plotly_fun <- function(valuation_date, index){
                     mode = 'lines', 
                     line = list(color = main_color),
                     hovertemplate = paste0("<extra><b>Curve Date: %{x}</b><br>Index Level: %{y:.0f}<br></extra>")) %>%
-    plotly::layout(xaxis = list(title = "Date"),
-                   yaxis = list(title = "Index Level"),
+    plotly::layout(xaxis = list(title = "", showticklabels = F, zeroline = F,  showline = F),
+                   yaxis = list(title = list(text='Index\n Level', standoff = 10),tickformat = "digits"),
                    showlegend = FALSE
     )
   
@@ -281,36 +269,53 @@ entr_pnl_plotly_fun <- function(valuation_date, index){
                     name = ~ifelse(log_ret < 0,"loss","profit"), 
                     type = 'bar', 
                     color = ~log_ret < 0, 
-                    colors = c(palette_main[1], palette_main[4])) %>%
-      plotly::layout(xaxis = list(title = "Date"),
-                     yaxis = list(title = "Log Returns"),
+                    colors = c(palette_main[1], palette_main[4]),
+                    hovertemplate = paste0("<extra><b>P&L Date: %{x}</b><br>:P&L %{y:.2f}<br></extra>")) %>%
+      plotly::layout(xaxis = list(title = "", showticklabels = F, zeroline = F,  showline = F),
+                     yaxis = list(title = list(text='Log\n Returns', standoff = 10), tickformat = "%"),
                      showlegend = FALSE
                      )
+                     
   
-  index_vol_plot <- 
-    index_hist %>% 
+  index_vol_plot <- index_hist %>% 
     dplyr::arrange(date) %>% 
     plotly::plot_ly(x = ~date, y = ~volume , 
                     name = "Volume", 
                     type = 'bar', 
-                    marker = list(color = palette_main[3])) %>% 
-      plotly::layout(xaxis = list(title = "Date"),
-                   yaxis = list(title = "Traded Volume"),
+                    marker = list(color = palette_main[3]),
+                    hovertemplate = paste0("<extra><b>Trade Date: %{x}</b><br>Volume: %{y:.0f}<br></extra>")) %>% 
+      plotly::layout(xaxis = list(title = "", showticklabels = F, zeroline = F,  showline = F),
+                   yaxis = list(title = list(text='Traded\n Volume', standoff = 20)),
                    showlegend = FALSE
     )
-      
+
+  entropy_tl <- entropy_hist %>% 
+    dplyr::distinct(date, threshold, .keep_all = T) %>% 
+    dplyr::arrange(date) %>% 
+    plotly::plot_ly(x = ~date, y = ~entropy,
+                    type = 'scatter',
+                    mode = 'lines',
+                    color = ~as.factor(threshold),
+                    colors = c(palette_main[1],palette_main[2],palette_main[3],palette_main[4]),
+                    hovertemplate = paste0("<extra><b>Entropy Date: %{x}</b><br>Entropy Level: %{y:.0f}<br></extra>")) %>% 
+      plotly::layout(xaxis = list(title = "Date"),
+                     yaxis = list(title = list(text='Entropy', standoff = 10)),
+                     showlegend = FALSE
+      )
+
+    
     
     entropy_subs <- plotly::subplot(
-      index_price_plot,index_pnl_plot,index_vol_plot,
+      index_price_plot,index_pnl_plot,index_vol_plot,entropy_tl,
       margin = 0.005, 
-      nrows = 3,
-      heights = c(0.5,0.25,0.25),
-      shareX = TRUE,
+      nrows = 4,
+      heights = c(0.4,0.1,0.1,0.4),
+      shareX = F,
       shareY = TRUE
     ) %>% 
       plotly::layout(annotations = list(
         list(x = -0.2 , 
-             y = -0.15, 
+             y = -0.3, 
              text = "<b>click on date to see correlation groups</b>",
              showarrow = F,
              xref='paper',
@@ -322,109 +327,107 @@ entr_pnl_plotly_fun <- function(valuation_date, index){
 }
 
 
-entrop_tic_group_fun <- function(start_date, cur_idx, corr_th = 0.7){
+
+#start_date <- "2020-03-25"
+#cur_idx <- "^GDAXI"
+#grouping <- "Industry"
+entrop_tic_group_fun <- function(start_date, cur_idx, corr_th, sector_info, grouping){
 
   
-  end_date <- bizdays::offset(lubridate::today(), -200, 'UnitedStates/NYSE')
+  end_date <- bizdays::offset(lubridate::as_date(start_date), -51, 'UnitedStates/NYSE')
+
   
-  
-  
-  
-  
-  # !!!!!!!!!!!!!!!!!!!!!!!!!
-  
-#  idx_tic_rel muss erst noch geladen werden - am besten 1x global !!!!!!!!!!!!!
-  
-  test_tic <- idx_tic_rel %>% dplyr::filter(index == cur_idx) %>% dplyr::pull(ticker_yh) %>% 
+  idx_tickers <- idx_tic_rel %>% dplyr::filter(index == cur_idx) %>% dplyr::pull(ticker_yh) %>% 
     paste0(., collapse = "', '")
-  
-#  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  
-  
-  
-  
-  
-  
-  
+
+
   mydb <- connect_to_DB()
+  
+  entropy_groups <- DBI::dbGetQuery(mydb, paste0("SELECT COUNT(DISTINCT(membership)) AS n
+                         FROM fin_index_entropy_history_3
+                         WHERE date = '", start_date,"'
+                         AND indices = '", cur_idx,"'
+                         AND threshold = '", corr_th,"'")) %>% 
+    dplyr::pull(n)
+  
+  
   ticker_hist <- DBI::dbGetQuery(mydb, paste0("SELECT *
                                  FROM fin_ticker_history
                                  WHERE date <= '",start_date,"' 
                                  AND date > '",end_date,"'
-                                 AND ticker_yh IN ('",test_tic,"')"))
-  DBI::dbDisconnect(mydb)
+                                 AND ticker_yh IN ('",idx_tickers,"')")) %>% 
+    dplyr::mutate(date = lubridate::as_date(date)) 
   
+  
+  DBI::dbDisconnect(mydb) 
+  
+
+
+  
+  date_template <- purrr::map_df(unique(ticker_hist$ticker_yh), date_seq_fun, end_date_fun = end_date, start_date_fun = start_date)
   
   suppressWarnings(
-    cor_matrix <- ticker_hist %>%
+    cor_matrix <- dplyr::left_join(date_template, ticker_hist[,c("close","ticker_yh","date")], by = c("ticker_yh","date")) %>%
       dplyr::arrange(date) %>% 
       dplyr::group_by(ticker_yh) %>%
       tidyr::fill(close, .direction = "updown") %>% 
       dplyr::mutate(log_ret = log(close/dplyr::lag(close))) %>% 
       tidyr::drop_na() %>%
-      dplyr::add_count() %>% 
       dplyr::ungroup() %>% 
-      dplyr::filter(n == max(n)) %>%
       dplyr::select(ticker_yh, log_ret) %>% 
       tidyr::pivot_wider(names_from = ticker_yh, values_from = log_ret) %>% # values_fn = length 
       tidyr::unnest(cols = dplyr::everything()) %>% 
       cor()
   )
   
+  
+  # Error Handling in case a correlation fails and prints NA. The correlation to itself is still 1 which leads to ncol()-1
+  cor_matrix <- cor_matrix[rowSums(is.na(cor_matrix)) != ncol(cor_matrix)-1, colSums(is.na(cor_matrix)) != nrow(cor_matrix)-1]
+  
+ 
   # Adjacency
   g  <- igraph::graph.adjacency(abs(cor_matrix) > as.numeric(corr_th), 
                                 mode = "upper", 
                                 weighted=TRUE, 
                                 diag = FALSE) # !!!!!!!!!!!!! ABSOLUTE CORR VALUES 
+# ENTROPY GROUPS  
+  cluster <- igraph::cluster_louvain(g)
   
+  length(unique(cluster$membership))
   
-  #Louvain Comunity Detection
-  #cluster <- igraph::cluster_louvain(g)
-  #groupd_df <- data.frame(group = cluster$membership,
-  #                        nodes = cluster$names)
-  #
-  #single_groups <- groupd_df %>% dplyr::count(group) %>% dplyr::filter(n == 1) %>% dplyr::pull(group)
-  #
-  #
-  ##Create df for plotting with ggplot
-  #gplot_netw <- ggnetwork::ggnetwork(g, 
-  #                                   layout = igraph::layout.fruchterman.reingold(g))
-  #gplot_netw <- dplyr::left_join(gplot_netw, groupd_df, by = c("name"="nodes"))
-  #
-  #plot <- gplot_netw %>% 
-  #  ggplot2::ggplot(ggplot2::aes(x = x, y = y, xend = xend, yend = yend)) +
-  #  ggnetwork::geom_edges(ggplot2::aes(linetype = "x"), color = "grey80", curvature = 0.1) +
-  #  ggnetwork::geom_nodes(ggplot2::aes(color = factor(group)), size = 3, alpha = 0.4) +
-  #  ggplot2::labs(title = stringr::str_c("<span style = 'font-size: 20pt; color:",main_color,"'> ",
-  #                                       start_date, "</span>"),
-  #                subtitle = stringr::str_c("<span style = 'font-size: 8pt'> Number of Independent Groups </span>",
-  #                                          "<span style = 'font-size: 20pt'> ", 
-  #                                          max(groupd_df$group) ,"</span>"),
-  #                y = "Logarithmic Returns") +
-  #  ggplot2::theme_void() +
-  #  ggplot2::theme(legend.position = "none",
-  #                 plot.title = ggtext::element_markdown(hjust = 0.95),
-  #                 plot.subtitle = ggtext::element_markdown(hjust = 0.95, 
-  #                                                          colour = main_color_light, 
-  #                                                          face = "bold")) 
-  #
-  #plotly::ggplotly(plot)
- 
+########################
+  
+  # Plot Details
+  comp_info <- tibble::tibble(ticker_yh = unique(ticker_hist$ticker_yh)) %>% 
+    dplyr::left_join(.,sector_info, by = "ticker_yh")
   vs <- igraph::V(g)
+  g <- igraph::set_vertex_attr(g, "Company", index = igraph::V(g), comp_info$ticker_yh)
+  g <- igraph::set_vertex_attr(g, "Industry", index = igraph::V(g), comp_info$BIC_1)
+  g <- igraph::set_vertex_attr(g, "Sector", index = igraph::V(g), comp_info$BIC_2)
+  g <- igraph::set_vertex_attr(g, "Description", index = igraph::V(g), comp_info$name)
+  
   es <- as.data.frame(igraph::get.edgelist(g)) # Get edgelist
   Ne <- length(es[1]$V1) #number of edges
   
-  node.data<-igraph::get.data.frame(g,what="vertices")
+#  node.data<-igraph::get.data.frame(g, what="vertices")
   L <- igraph::layout.fruchterman.reingold(g)
   Xn <- L[,1]
   Yn <- L[,2]
-  
+
+
   #Creates the nodes (plots the points)
   network <- plotly::plot_ly(x = ~Xn, y = ~Yn, #Node points
+                     type = "scatter",         
                      mode = "markers", 
-                     text = vs$name, 
-                     hoverinfo = "text",
-                     color =as.factor(node.data$name) )
+                     size = 2, # probably
+                     hovertemplate = paste0("Name: ",igraph::V(g)$Description,"\n",
+                                            "Ticker: ", igraph::V(g)$Company,"\n",
+                                            "Industry: ", igraph::V(g)$Industry,"\n",
+                                            "Sector: ", igraph::V(g)$Sector,
+                                            "<extra></extra>"),
+                     color = igraph::get.vertex.attribute(g,grouping)#as.factor(igraph::V(g)$Industry)
+                    )
+
   
   #Create edges
   edge_shapes <- list()
@@ -451,7 +454,9 @@ entrop_tic_group_fun <- function(start_date, cur_idx, corr_th = 0.7){
   
   graph <- plotly::layout(
     network,
-    title = 'Networks & Plotly',
+    title = list(text = paste0('Correlation Network as of <b>',start_date,'</b><br>',
+                               '<sup> Number of Groups </sup>', entropy_groups), 
+                 x = 1),
     shapes = edge_shapes,
     xaxis = axis,
     yaxis = axis,
@@ -463,11 +468,6 @@ entrop_tic_group_fun <- function(start_date, cur_idx, corr_th = 0.7){
   
   
 }
-
-
-
-
-
 
 
 

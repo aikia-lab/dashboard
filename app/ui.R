@@ -1,5 +1,6 @@
 
 library(shiny)
+library(shinyBS)
 library(magrittr)
 
 suppressMessages(bizdays::load_quantlib_calendars(c('UnitedStates/NYSE'),
@@ -67,11 +68,11 @@ shinyUI(
                 # 1st Menu:
                 shinydashboard::menuItem(strong("Market Volatility"),
                                          tabName = "sector_volas",
-                                         icon = icon("chart-line")),
+                                         icon = icon("bars")),
                 # 2nd Menu:
                 shinydashboard::menuItem(strong("FED Funds Rate"),
                                          tabName = "fed_funds",
-                                         icon = icon("project-diagram")),
+                                         icon = icon("table")),
             
                 # 3rd Menu:
                 shinydashboard::menuItem(strong("Index Entropy"),
@@ -236,15 +237,57 @@ shinyUI(
                                         shiny::fluidRow(
                                           shiny::h3("identify structural order via correlation limits"),
                                           
-                                          shiny::column(width = 2,
-                                                        shiny::selectInput("choose_idx", "Select Market Index", 
-                                                                           choices = get_available_indices())
-                                          )
+                                          shiny::column(width = 6,
+                                                        shiny::selectInput("choose_idx", 
+                                                                           label = "Select Market Index", 
+                                                                           choices = c("S&P 500" = "^GSPC",
+                                                                                       "Nasdaq 100" = "^NDX",
+                                                                                       "Euro Stoxx 50" = "^STOXX50E",
+                                                                                       "DAX 40" = "^GDAXI",
+                                                                                       "ASX" = "^AXJO"),
+                                                                           selected = "^NDX")
+                                          ),
+                                        
+                                    
+                                        shiny::column(width = 3,
+                                                      shiny::selectInput("choose_grouping", "Colour Nodes by Level", 
+                                                                         choices = c("Industry Level" = "Industry",
+                                                                                     "Sector Level" = "Sector"),
+                                                                         selected = "BIC_1")
                                         ),
+                                        shiny::column(width = 3,
+                                                      shiny::selectInput("choose_entropy_th", 
+                                                                         label = tags$span("Choose Entropy Level", 
+                                                                                           shinyBS::bsButton("entropy_info", 
+                                                                                                    label = "", 
+                                                                                                    icon = icon("info"), 
+                                                                                                    style = "info", 
+                                                                                                    size = "extra-small")), 
+                                                                         choices = c("Correlation Limit 0.5" = 0.5,
+                                                                                     "Correlation Limit 0.6" = 0.6,
+                                                                                     "Correlation Limit 0.7" = 0.7,
+                                                                                     "Correlation Limit 0.8" = 0.8),
+                                                                         selected = 0.7,
+                                                                         ),
+                                                      shinyBS::bsPopover(
+                                                        id = "entropy_info",
+                                                        title = "More information",
+                                                        content = paste0(
+                                                          "On how Entropy works, please visit our website ",
+                                                          a("aikia.org", href = "https://aikia.org", target="_blank")
+                                                        ),
+                                                        placement = "right",
+                                                        trigger = "hover",
+                                                        options = list(container = "body")
+                                                      )
+                                        )
+                                          
+                                        
+                                      ),
                                         br(), br(),br(), br(),
                                           
                                         shiny::column(width = 6,
-                                          plotly::plotlyOutput("idx_entrop") %>%
+                                          plotly::plotlyOutput("idx_entrop",height = "600px") %>%
                                             shinycssloaders::withSpinner()
                                         ),
                                         shiny::column(width = 6,
@@ -253,7 +296,7 @@ shinyUI(
                                         )
                                       
                                     
-                                    )
+                  )
             
             )
         )
