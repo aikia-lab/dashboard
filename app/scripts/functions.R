@@ -327,10 +327,6 @@ entropy_pnl_fun <- function(valuation_date, index){
 }
 
 
-
-#start_date <- "2020-03-25"
-#cur_idx <- "^GDAXI"
-#grouping <- "Industry"
 entrop_tic_group_fun <- function(start_date, cur_idx, corr_th, sector_info, grouping){
 
   
@@ -389,14 +385,8 @@ entrop_tic_group_fun <- function(start_date, cur_idx, corr_th, sector_info, grou
   g  <- igraph::graph.adjacency(abs(cor_matrix) > as.numeric(corr_th), 
                                 mode = "upper", 
                                 weighted=TRUE, 
-                                diag = FALSE) # !!!!!!!!!!!!! ABSOLUTE CORR VALUES 
-# ENTROPY GROUPS  
-  cluster <- igraph::cluster_louvain(g)
-  
-  length(unique(cluster$membership))
-  
-########################
-  
+                                diag = FALSE)
+
   # Plot Details
   comp_info <- tibble::tibble(ticker_yh = unique(ticker_hist$ticker_yh)) %>% 
     dplyr::left_join(.,sector_info, by = "ticker_yh")
