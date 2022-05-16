@@ -30,7 +30,7 @@ RUN install.r shiny tidyverse forecast jsonlite htmltools DBI \
     scales gt shinydashboard bizdays here patchwork ggtext heatmaply \
     metathis shinydashboardPlus
     
-RUN Rscript -e "remotes::install_github(c('daattali/shinycssloaders', 'gadenbuie/shinyThings'))"
+RUN Rscript -e "remotes::install_github(c('daattali/shinycssloaders', 'gadenbuie/shinyThings','ebailey78/shinyBS','igraph/rigraph@master'))"
 RUN echo "local(options(shiny.port = 3838, shiny.host = '0.0.0.0'))" > /usr/lib/R/etc/Rprofile.site
 
 RUN addgroup --system app && adduser --system --ingroup app app
