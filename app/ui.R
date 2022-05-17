@@ -54,6 +54,7 @@ shinyUI(
         # sidebar ----------------------------------------------------------------
         
         shinydashboardPlus::dashboardSidebar(
+          collapsed = TRUE,
         # workaround for reactive sidebar collapsing        
           tags$script("$(document).on('click', '.sidebar-toggle', function () {
                       Shiny.onInputChange('SideBar_col_react', Math.random())});"),
@@ -68,11 +69,11 @@ shinyUI(
                 # 1st Menu:
                 shinydashboard::menuItem(strong("Market Volatility"),
                                          tabName = "sector_volas",
-                                         icon = icon("bars")),
+                                         icon = icon("bars-staggered")),
                 # 2nd Menu:
                 shinydashboard::menuItem(strong("FED Funds Rate"),
                                          tabName = "fed_funds",
-                                         icon = icon("table")),
+                                         icon = icon("chart-line")),
             
                 # 3rd Menu:
                 shinydashboard::menuItem(strong("Index Entropy"),
@@ -87,13 +88,7 @@ shinyUI(
                 tags$link(rel = "stylesheet", 
                           type = "text/css", 
                           href = "custom.css"),
-                tags$style(HTML("
-                      .shiny-output-error-validation {
-                        color: #248A8A;
-                        font-weight: bold;
-                        font-size: 150%;
-                      }")
-                )
+                tags$style("@import url(https://use.fontawesome.com/releases/v6.1.1/css/all.css);")
             ),
         
         # Website metadata for eg link preview
@@ -287,7 +282,7 @@ shinyUI(
                                         br(), br(),br(), br(),
                                           
                                         shiny::column(width = 6,
-                                          plotly::plotlyOutput("idx_entrop",height = "600px") %>%
+                                          plotly::plotlyOutput("idx_entrop", height = "600px") %>%
                                             shinycssloaders::withSpinner()
                                         ),
                                         shiny::column(width = 6,

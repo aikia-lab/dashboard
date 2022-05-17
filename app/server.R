@@ -11,7 +11,20 @@ library(DBI)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
   
-
+  
+  
+  # Update to last available date
+  shiny::updateDateInput(
+          session, 
+          "val_date",
+          value = lubridate::as_date(
+                    bizdays::offset(lubridate::today(),
+                            -1,
+                            'UnitedStates/NYSE'))
+  )
+  
+  
+  
   # Temprorary Initial load of data Frames
  
   mydb <- connect_to_DB()
@@ -65,14 +78,7 @@ shinyServer(function(input, output, session) {
   DBI::dbDisconnect(mydb)
   
 
-  shiny::updateDateInput(
-          session, 
-          "val_date",
-          value = lubridate::as_date(
-                    bizdays::offset(lubridate::today(),
-                            -1,
-                            'UnitedStates/NYSE'))
-  )
+
   
   write_counter_to_sql()
   

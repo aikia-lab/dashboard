@@ -229,10 +229,12 @@ meeting_data <- function(act_meeting_date = NULL){
 entropy_pnl_fun <- function(valuation_date, index){
     
   
-  date_hist <- bizdays::offset(lubridate::today(), -200, 'UnitedStates/NYSE')
+#  date_hist <- bizdays::offset(lubridate::today(), -200, 'UnitedStates/NYSE')
+  date_hist <- "2020-01-02" # to include Corona Crisis
 
   mydb <- connect_to_DB()
   
+
   index_hist <- DBI::dbGetQuery(mydb, paste0("SELECT * 
                          FROM fin_index_history
                          WHERE date <= '", valuation_date,"'
@@ -240,7 +242,7 @@ entropy_pnl_fun <- function(valuation_date, index){
                          AND ticker_yh = '", index,"'"))
   
   entropy_hist <- DBI::dbGetQuery(mydb, paste0("SELECT * 
-                         FROM fin_index_entropy_history_3
+                         FROM fin_index_entropy_history
                          WHERE date <= '", valuation_date,"'
                          AND date > '", date_hist, "'
                          AND indices = '", index,"'"))
@@ -255,8 +257,9 @@ entropy_pnl_fun <- function(valuation_date, index){
                     type = 'scatter',
                     mode = 'lines', 
                     line = list(color = main_color),
-                    hovertemplate = paste0("<extra><b>Curve Date: %{x}</b><br>Index Level: %{y:.0f}<br></extra>")) %>%
-    plotly::layout(xaxis = list(title = "", showticklabels = F, zeroline = F,  showline = F),
+                    hovertemplate = paste0("<extra><b>Curve Date: %{x}</b><br>Index Level: %{y:,.0f}<br></extra>")) %>%
+    plotly::layout(xaxis = list(title = "Date", type="date", tick0 = ~min(date), dtick = "M2"),
+                   #xaxis = list(title = "", showticklabels = F, zeroline = F,  showline = F),
                    yaxis = list(title = list(text='Index\n Level', standoff = 10),tickformat = "digits"),
                    showlegend = FALSE
     )
@@ -270,9 +273,12 @@ entropy_pnl_fun <- function(valuation_date, index){
                     type = 'bar', 
                     color = ~log_ret < 0, 
                     colors = c(palette_main[1], palette_main[4]),
-                    hovertemplate = paste0("<extra><b>P&L Date: %{x}</b><br>:P&L %{y:.2f}<br></extra>")) %>%
-      plotly::layout(xaxis = list(title = "", showticklabels = F, zeroline = F,  showline = F),
-                     yaxis = list(title = list(text='Log\n Returns', standoff = 10), tickformat = "%"),
+                    hovertemplate = paste0("<extra><b>P&L Date: %{x}</b><br>:P&L %{y:.2%}<br></extra>")) %>%
+      plotly::layout(xaxis = list(title = "Date", type="date", tick0 = ~min(date), dtick = "M2"),
+        #xaxis = list(title = "", showticklabels = F, zeroline = F,  showline = F),
+                     yaxis = list(title = list(text='Log\n Returns', standoff = 10), 
+                                  tickformat = "%",
+                                  tickvals = list(0)),
                      showlegend = FALSE
                      )
                      
@@ -283,8 +289,9 @@ entropy_pnl_fun <- function(valuation_date, index){
                     name = "Volume", 
                     type = 'bar', 
                     marker = list(color = palette_main[3]),
-                    hovertemplate = paste0("<extra><b>Trade Date: %{x}</b><br>Volume: %{y:.0f}<br></extra>")) %>% 
-      plotly::layout(xaxis = list(title = "", showticklabels = F, zeroline = F,  showline = F),
+                    hovertemplate = paste0("<extra><b>Trade Date: %{x}</b><br>Volume: %{y:,.0f}<br></extra>")) %>% 
+      plotly::layout(xaxis = list(title = "Date", type="date", tick0 = ~min(date), dtick = "M2"),
+        #xaxis = list(title = "", showticklabels = F, zeroline = F,  showline = F),
                    yaxis = list(title = list(text='Traded\n Volume', standoff = 20)),
                    showlegend = FALSE
     )
@@ -297,8 +304,9 @@ entropy_pnl_fun <- function(valuation_date, index){
                     mode = 'lines',
                     color = ~as.factor(threshold),
                     colors = c(palette_main[1],palette_main[2],palette_main[3],palette_main[4]),
-                    hovertemplate = paste0("<extra><b>Entropy Date: %{x}</b><br>Entropy Level: %{y:.0f}<br></extra>")) %>% 
-      plotly::layout(xaxis = list(title = "Date"),
+                    text = ~threshold,
+                    hovertemplate = paste0("<extra><b>Entropy Date: %{x}</b><br>threshold limit: %{text:.1f}<br>current Level: %{y:.1f}</extra>")) %>% 
+      plotly::layout(xaxis = list(title = "Date", type="date", tick0 = ~min(date), dtick = "M2"),
                      yaxis = list(title = list(text='Entropy', standoff = 10)),
                      showlegend = FALSE
       )
@@ -310,7 +318,7 @@ entropy_pnl_fun <- function(valuation_date, index){
       margin = 0.005, 
       nrows = 4,
       heights = c(0.4,0.1,0.1,0.4),
-      shareX = F,
+      shareX = T,
       shareY = TRUE
     ) %>% 
       plotly::layout(annotations = list(
@@ -327,6 +335,10 @@ entropy_pnl_fun <- function(valuation_date, index){
 }
 
 
+#start_date <- "2022-05-16"
+#cur_idx <- "^NDX"
+#corr_th <- 0.7
+#grouping <- "Industry"
 entrop_tic_group_fun <- function(start_date, cur_idx, corr_th, sector_info, grouping){
 
   
@@ -340,7 +352,7 @@ entrop_tic_group_fun <- function(start_date, cur_idx, corr_th, sector_info, grou
   mydb <- connect_to_DB()
   
   entropy_groups <- DBI::dbGetQuery(mydb, paste0("SELECT COUNT(DISTINCT(membership)) AS n
-                         FROM fin_index_entropy_history_3
+                         FROM fin_index_entropy_history
                          WHERE date = '", start_date,"'
                          AND indices = '", cur_idx,"'
                          AND threshold = '", corr_th,"'")) %>% 

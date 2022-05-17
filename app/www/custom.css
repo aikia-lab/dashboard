@@ -78,3 +78,12 @@
 #spinner-f01d8a58fdfbc354b715afbf6633d22c{
 border-left: #61B7B7!important;
 }
+
+
+.shiny-output-error-validation {
+  color: #248A8A;
+  font-weight: bold;
+  font-size: 150%;
+}
+
+
