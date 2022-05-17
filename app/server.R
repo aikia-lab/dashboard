@@ -95,9 +95,9 @@ shinyServer(function(input, output, session) {
   # reactive logo   
   size <- reactive({
     if(vals$collapsed){
-      return("50px") 
+      return("120px") 
     } else {
-      return("120px")
+      return("50px")
     }
   }) 
   
