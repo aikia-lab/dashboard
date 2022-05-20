@@ -407,6 +407,7 @@ entrop_tic_group_fun <- function(start_date, cur_idx, corr_th, sector_info, grou
   g <- igraph::set_vertex_attr(g, "Industry", index = igraph::V(g), comp_info$BIC_1)
   g <- igraph::set_vertex_attr(g, "Sector", index = igraph::V(g), comp_info$BIC_2)
   g <- igraph::set_vertex_attr(g, "Description", index = igraph::V(g), comp_info$name)
+  g <- igraph::set_vertex_attr(g, "Sub_Sector", index = igraph::V(g), comp_info$issuer_industry)
   
   es <- as.data.frame(igraph::get.edgelist(g)) # Get edgelist
   Ne <- length(es[1]$V1) #number of edges
@@ -425,7 +426,8 @@ entrop_tic_group_fun <- function(start_date, cur_idx, corr_th, sector_info, grou
                      hovertemplate = paste0("Name: ",igraph::V(g)$Description,"\n",
                                             "Ticker: ", igraph::V(g)$Company,"\n",
                                             "Industry: ", igraph::V(g)$Industry,"\n",
-                                            "Sector: ", igraph::V(g)$Sector,
+                                            "Sector: ", igraph::V(g)$Sector,"\n",
+                                            "Sub Sector: ", igraph::V(g)$Sub_Sector,
                                             "<extra></extra>"),
                      color = igraph::get.vertex.attribute(g,grouping)#as.factor(igraph::V(g)$Industry)
                     )

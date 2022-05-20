@@ -6,23 +6,28 @@ library(magrittr)
 library(DBI)
 
 
-
+c <- 1
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
   
+  # Asthe App runs 24/7 we need to refresh the session to provide the right dates
+  if(c==1){
+    c <<- 2
+    session$reload()
+    return()
+  }
   
-  
-  # Update to last available date
-  shiny::updateDateInput(
-          session, 
-          "val_date",
-          value = lubridate::as_date(
-                    bizdays::offset(lubridate::today(),
-                            -1,
-                            'UnitedStates/NYSE'))
-  )
-  
+#  # Update to last available date
+#  shiny::updateDateInput(
+#          session, 
+#          "val_date",
+#          value = lubridate::as_date(
+#                    bizdays::offset(lubridate::today(),
+#                            -1,
+#                            'UnitedStates/NYSE'))
+#  )
+#  
   
   
   # Temprorary Initial load of data Frames
@@ -48,6 +53,7 @@ shinyServer(function(input, output, session) {
                                     ticker_yh,
                                     name ,
                                     industry_group,
+                                    issuer_industry,
                                     bics_level_1_sector_name,
                                     bics_level_2_industry_group_name
                                    FROM fin_ticker_meta_data") %>% 
@@ -80,7 +86,7 @@ shinyServer(function(input, output, session) {
 
 
   
-  write_counter_to_sql()
+#  write_counter_to_sql()
   
 
 # Resizing aikia logo -----------------------------------------------------
