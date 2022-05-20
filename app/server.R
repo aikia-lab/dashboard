@@ -86,7 +86,7 @@ shinyServer(function(input, output, session) {
 
 
   
-#  write_counter_to_sql()
+  write_counter_to_sql()
   
 
 # Resizing aikia logo -----------------------------------------------------
