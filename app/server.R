@@ -6,28 +6,37 @@ library(magrittr)
 library(DBI)
 
 
-c <- 1
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
+
+  # Update to last available date
+  shiny::updateDateInput(
+          session, 
+          "val_date",
+          value = lubridate::as_date(
+                    bizdays::offset(lubridate::today(),
+                            -1,
+                            'UnitedStates/NYSE'))
+  )
   
-  # Asthe App runs 24/7 we need to refresh the session to provide the right dates
-  if(c==1){
-    c <<- 2
-    session$reload()
-    return()
-  }
+  shiny::updateDateInput(
+    session, 
+    "val_date",
+    fed_date_1 = lubridate::as_date(
+      bizdays::offset(lubridate::today(),
+                      -1,
+                      'UnitedStates/NYSE'))
+  )
   
-#  # Update to last available date
-#  shiny::updateDateInput(
-#          session, 
-#          "val_date",
-#          value = lubridate::as_date(
-#                    bizdays::offset(lubridate::today(),
-#                            -1,
-#                            'UnitedStates/NYSE'))
-#  )
-#  
+  shiny::updateDateInput(
+    session, 
+    "val_date",
+    fed_date_2 = lubridate::as_date(
+      bizdays::offset(lubridate::today(),
+                      -2,
+                      'UnitedStates/NYSE'))
+  )
   
   
   # Temprorary Initial load of data Frames
