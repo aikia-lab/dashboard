@@ -22,8 +22,8 @@ shinyServer(function(input, output, session) {
   
   shiny::updateDateInput(
     session, 
-    "val_date",
-    fed_date_1 = lubridate::as_date(
+    "fed_date_1",
+    value = lubridate::as_date(
       bizdays::offset(lubridate::today(),
                       -1,
                       'UnitedStates/NYSE'))
@@ -31,8 +31,8 @@ shinyServer(function(input, output, session) {
   
   shiny::updateDateInput(
     session, 
-    "val_date",
-    fed_date_2 = lubridate::as_date(
+    "fed_date_2",
+    value = lubridate::as_date(
       bizdays::offset(lubridate::today(),
                       -2,
                       'UnitedStates/NYSE'))
