@@ -37,6 +37,8 @@ shinyServer(function(input, output, session) {
                       -2,
                       'UnitedStates/NYSE'))
   )
+  #----------------------------------------------------------
+  
   
   
   # Temprorary Initial load of data Frames
