@@ -75,7 +75,8 @@ shinyServer(function(input, output, session) {
                                   stringr::str_c(
                                     "SELECT *
                                   FROM v_fin_index_expanded")) %>% 
-    dplyr::mutate(date = lubridate::as_date(date))
+    dplyr::mutate(date = lubridate::as_date(date)) %>% 
+    dplyr::distinct(ticker_yh, date, .keep_all = T)
   
   
   # Get IDX TIC Relation
