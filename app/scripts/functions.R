@@ -8,14 +8,17 @@ connect_to_DB <- function(mydb, group = "fin_data"){
     
     if(Sys.info()[[1]] == "Windows"){ #For testing on Windows
       
+      ip <- unlist(pingr::nsl("aikia.org")$answer$data)
       mydb <- DBI::dbConnect(RMariaDB::MariaDB(), 
                              group = group, 
+                             host = ip,
                              default.file = stringr::str_c(here::here(),
                                                            "/my.cnf"))
       
     } else { #Production on Linux (No Macs here ;))
       
-      mydb <- DBI::dbConnect(RMariaDB::MariaDB(), group = group)
+      ip <- unlist(pingr::nsl("aikia.org")$answer$data)
+      mydb <- DBI::dbConnect(RMariaDB::MariaDB(),host = ip, group = group)
       
     }
   }
