@@ -478,5 +478,117 @@ entrop_tic_group_fun <- function(start_date, cur_idx, corr_th, sector_info, grou
 
 
 
+eco_fc_fun <- function(country_id,type_id){
+  
+  mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+  
+  data_te <- DBI::dbGetQuery(mydb, stringr::str_c("SELECT * 
+                                    FROM eco_forecasts_te
+                                    WHERE country IN ('",country_id,"')
+                                    AND type = '",type_id,"'")) %>% 
+    dplyr::as_tibble() %>% 
+    dplyr::mutate(period_date = lubridate::as_date(period_date))
+  
+  DBI::dbDisconnect(mydb)
+  
+  if(nrow(data_te)<1){
+      return()
+  }
+  
+
+  units <- unique(data_te$unit)
+  units_min <- ifelse(min(data_te$forecast_value)<0,min(data_te$forecast_value)*1.1,min(data_te$forecast_value)*0.9)
+  units_max <- ifelse(max(data_te$forecast_value)<0,max(data_te$forecast_value)*0.9,max(data_te$forecast_value)*1.1)
+
+  # get last 5 update dates 
+  date_selector <- data_te %>% 
+    dplyr::filter(period != 'actual') %>% 
+    dplyr::arrange(desc(retrieval_date)) %>% 
+    dplyr::distinct(retrieval_date) %>% 
+    head(10) %>% 
+    dplyr::pull(retrieval_date)
+  
+  # get last 5 update curves
+  histo_curve <- function(date_id){
+    last_update <- data_te %>% 
+      dplyr::filter(period != 'actual',
+                    retrieval_date <= date_id
+      ) %>% 
+      dplyr::select(period_date, retrieval_date,forecast_value) %>%
+      dplyr::group_by(period_date) %>%  
+      dplyr::arrange(period_date,retrieval_date) %>%
+      dplyr::mutate(number = dplyr::row_number(), 
+                    period_date = lubridate::as_date(period_date)) %>%
+      dplyr::filter(number == max(number)) %>% 
+      dplyr::ungroup() %>% 
+      dplyr::mutate(curve_date = date_id)
+  }
+  
+  forecast_curves <- purrr::map_df(date_selector, histo_curve)
+  
+  
+  # map actuals to these curves
+  actual_dots <- data_te %>% 
+    dplyr::filter(period == 'actual') %>% 
+    dplyr::select(period_date, retrieval_date,forecast_value)
+  
+  actual_dots <- purrr::map_df(date_selector,~cbind(.,actual_dots)) %>% dplyr::rename(curve_date = 1) %>% dplyr::as_tibble()
+  
+  # create buttons
+  
+  get_buttons <- function(date_id){
+    
+    list(method = "restyle",
+         args = list("transforms[0].value", date_id),
+         label = sprintf('Forecast @ %s', date_id),
+         visible = TRUE)
+  }
+  
+  date_buttons <- purrr::map(unique(sort(as.character(forecast_curves$curve_date))), get_buttons)
+  
+  eco_plot <- forecast_curves %>% 
+    plotly::plot_ly(x = ~period_date, 
+                    y = ~forecast_value,
+                    type = 'scatter',
+                    mode = 'lines',
+                    name = 'forecasts',
+                    color = I(aikia::aikia_secondary()),
+                    hovertemplate = paste0("forecasted: %{y} ",units,"<br>",
+                                           "for %{x}","<extra></extra>"),
+                    transforms = list(
+                      list(
+                        type = "filter",
+                        target= ~curve_date,
+                        operation = 'in',
+                        value = unique(sort(forecast_curves$curve_date,decreasing = T))[1]
+                      )
+                    ))  %>% 
+    plotly::add_markers(data = actual_dots,
+                        x = ~period_date,
+                        y = ~forecast_value,
+                        hovertemplate = paste0(type, "<br>",
+                                               "%{y} ",units," <br>",
+                                               "at: %{x} <extra></extra>"),
+                        name = 'last actual value',
+                        color = I(aikia::aikia_main())) %>% 
+    plotly::layout(annotations = list(
+      list(x = 0.5 , y = 1.0, text = "<b>Actuals vs Forecasts</b>", showarrow = F, xref='paper', yref='paper', 
+           font = list(size = 24)),
+      list(x = 0.5 , y = 0.95, text = "<b></b>", showarrow = F, xref='paper', yref='paper')),
+      xaxis = list(title = "<b>Date</b>"),
+      yaxis = list(title = paste0("Values in <b>",units,"</b>"),
+                   range = c(units_min,units_max)),
+      updatemenus = list(
+        list(
+          x= 1,
+          y = 1,
+          buttons = date_buttons
+        )
+      ))
+  
+  
+  return(eco_plot)
+  
+}
 
 

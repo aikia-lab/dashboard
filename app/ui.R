@@ -78,7 +78,11 @@ shinyUI(
                 # 3rd Menu:
                 shinydashboard::menuItem(strong("Index Entropy"),
                                          tabName = "idx_entro",
-                                         icon = icon("project-diagram"))
+                                         icon = icon("project-diagram")),
+                # 4th Menu:
+                shinydashboard::menuItem(strong("Eco Forecasts"),
+                                         tabName = "eco_fc",
+                                         icon = icon("chart-simple"))
             )
         ),
         
@@ -289,9 +293,58 @@ shinyUI(
                                           plotly::plotlyOutput("date_entropy") %>%
                                             shinycssloaders::withSpinner()
                                         )
-                                      
-                                    
+                  ),
+
+                                                                          
+# Eco actual vs forecasts -------------------------------------------------                  
+                  
+                  shinydashboard::tabItem(tabName = "eco_fc",
+                                          h2("Economic Actuals vs Forecasts"),
+                                          
+                                          shiny::fluidRow(
+                                            shiny::h3("Check if actual figures match forecasted ones"),
+                                            
+                                            shiny::column(width = 3,
+                                                shiny::selectInput("choose_eco_country", 
+                                                                   label = "Select Country", 
+                                                                   choices = c("United States" = "united-states",
+                                                                               "China" = "china",
+                                                                               "Germany" = "germany",
+                                                                               "Japan" = "japan",
+                                                                               "United Kingdom" = "united-kingdom",
+                                                                               "France" ="france",
+                                                                               "Italy" = "italy",
+                                                                               "India" = "india"),
+                                                                   selected = "united-states"),
+                                            ),
+                                            shiny::column(width = 3,
+                                                shiny::selectInput("choose_eco_type", 
+                                                                   label = "Select economic factor", 
+                                                                   choices = c("Government Bond 10Y",
+                                                                               "GDP Annual Growth Rate",
+                                                                               "Current Account to GDP",
+                                                                               "Balance of Trade",
+                                                                               "Initial Jobless Claims",
+                                                                               "Labour Costs",
+                                                                               "Productivity",
+                                                                               "Imports",
+                                                                               "Exports"),
+                                                                   selected = "Government Bond 10Y")
+                                            )
+                                            
+                                          ),
+                                          br(), br(),br(), br(),
+                                          
+                                          shiny::column(width = 10,
+                                                        plotly::plotlyOutput("eco_forecasts", height = "600px") %>%
+                                                          shinycssloaders::withSpinner()
+                                          )
                   )
+                        
+
+
+
+
             
             )
         )

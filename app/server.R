@@ -263,6 +263,27 @@ shinyServer(function(input, output, session) {
     }
     
   })
+  
+
+# actual vs forecasts -----------------------------------------------------
+
+  eco_plot <- reactive({
+    req(input$choose_eco_country)
+    eco_fc_fun(country_id = input$choose_eco_country,
+               type_id = input$choose_eco_type)
+    
+  })
+  
+  output$eco_forecasts <- plotly::renderPlotly({
+    
+    validate(
+        need(!is.null(eco_plot()), 
+               "                  No data for this Country and Economic Type")
+    )
+    
+    eco_plot()
+    
+  })  
 
   
 })
