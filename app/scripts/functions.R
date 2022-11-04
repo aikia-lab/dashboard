@@ -566,7 +566,7 @@ eco_fc_fun <- function(country_id,type_id){
     plotly::add_markers(data = actual_dots,
                         x = ~period_date,
                         y = ~forecast_value,
-                        hovertemplate = paste0(type, "<br>",
+                        hovertemplate = paste0(type_id, "<br>",
                                                "%{y} ",units," <br>",
                                                "at: %{x} <extra></extra>"),
                         name = 'last actual value',
