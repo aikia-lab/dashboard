@@ -202,7 +202,7 @@ sector_line_chart_fun <- function(index_id, date, index_mapping, vola_history){
                    mode = 'lines',
                    text = ~name,
                    color = ~ticker_yh,
-                   hovertemplate = "Index: %{text}<br>Price: %{y:.0}<br>Date: %{x}<extra></extra>",
+                   hovertemplate = paste0("Index: %{text}<br>Price: %{y: .4r} <br>Date: %{x}<extra></extra>"),
                    colors = main_color) %>% 
      plotly::layout(xaxis = list(title = "Date",
                                  range = c(bizdays::offset(lubridate::as_date(date),-50,'UnitedStates/NYSE'),lubridate::as_date(date))),          
@@ -244,7 +244,7 @@ sector_line_chart_fun <- function(index_id, date, index_mapping, vola_history){
                     type = 'bar',
                     text = ~name,
                     color = ~ticker_yh,
-                    hovertemplate = 'Index: %{text}<br>Return: %{y:.2}<br>Date: %{x}',
+                    hovertemplate = 'Index: %{text}<br>Return: %{y:.2%}<br>Date: %{x}<extra></extra>',
                     colors = main_color) %>% 
    plotly::layout(xaxis = list(title = "Date",
                                range = c(bizdays::offset(lubridate::as_date(date),-50,'UnitedStates/NYSE'),lubridate::as_date(date)),

@@ -98,7 +98,7 @@ shinyServer(function(input, output, session) {
 
 
   
-  write_counter_to_sql()
+#  write_counter_to_sql()
   
 
 # Resizing aikia logo -----------------------------------------------------
@@ -135,6 +135,8 @@ shinyServer(function(input, output, session) {
   
   
 # Financial Sector Plots --------------------------------------------------
+  
+  # TAB VOLA PLOTS
   sector_vola <- shiny::reactiveVal(NULL)
   
   shiny::observe({
@@ -179,7 +181,34 @@ shinyServer(function(input, output, session) {
 
   })
   
+  
+  # TAB RETURN PLOTS
+  sector_returns <- shiny::reactiveVal(NULL)
+  
+  shiny::observe({
+    
+    sector_returns_ggplot <- sector_return_plot_fun(input$val_date,
+                                                 input$index_location, 
+                                                 index_mapping = index_mapping, 
+                                                 idx_history = vola_history)
+    
+    sector_returns(sector_returns_ggplot)
+  })
+  
 
+  output$dtd_ret <- shiny::renderPlot({
+    sector_returns()$day_plot
+  })
+  output$wtd_ret <- shiny::renderPlot({
+    sector_returns()$week_plot
+  })
+  output$qtd_ret <- shiny::renderPlot({
+    sector_returns()$quarter_plot
+  })
+  output$ytd_ret <- shiny::renderPlot({
+    sector_returns()$year_plot
+  })
+  
 # FED Funds Rate ----------------------------------------------------------
   fed_rates <- shiny::reactiveVal(NULL)
   meeting_date <- shiny::reactiveVal(NULL)

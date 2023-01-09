@@ -99,7 +99,7 @@ shinyUI(
             metathis::meta() %>%
               metathis::meta_social(
                 title = "Financial Market Dashboard",
-                description = "analyze the weekly Index volatility change by sector for the US and EU",
+                description = "analyze economic timeseries and financial market sectors for the US and EU",
                 url = "https://aikia.org/dashboard/",
                 image = "https://aikia.org/images/logo_aikia.png",
                 image_alt = "aikia logo",
@@ -125,45 +125,105 @@ shinyUI(
                                       selected_background = main_color_light),
                                     # https://jnolis.com/blog/shiny_mobile/
                                     
-                                    shiny::fluidRow(
-                                      shiny::column(12,
-                                                    class = "col-sm-12",
-                                                    shiny::div(
-                                                      class = "container-fluid",
-                                                      shiny::div(
-                                                        class = "text-center text-lg-start",
-                                                        conditionalPanel(
-                                                          condition = 'input.index_location == 2',
-                                                          shiny::h3("Volatility Overview of 'Stoxx Europe 600' Index Family")
+                                    shiny::tabsetPanel(id = "tabs",
+                                      # Index Vola TAb
+                                      shiny::tabPanel(h5(HTML("<b>Index Volatility</b>"), style="text-align:center"),
+                                                      id = "idx_vola",
+                                        shiny::fluidRow(
+                                          shiny::column(12,
+                                                        class = "col-sm-12",
+                                                        shiny::div(
+                                                          class = "container-fluid",
+                                                          shiny::div(
+                                                            class = "text-center text-lg-start",
+                                                            conditionalPanel(
+                                                              condition = 'input.index_location == 2',
+                                                              shiny::h3("Volatility Overview of 'Stoxx Europe 600' Index Family")
+                                                            ),
+                                                            conditionalPanel(
+                                                              condition = 'input.index_location == 1',
+                                                              shiny::h3("Volatility Overview of 'Dow Jones US' Index Family")
+                                                            ),
+                                                            shiny::h4("date to date relative change of volatility % -levels")
+                                                          )
+                                                        ), 
+                                                
+                                                        shiny::div(
+                                                          # wrapping Output in div lets us align it to the right
+                                                          plotly::plotlyOutput("sector_vola",
+                                                                               width = "100%",
+                                                                               height = "600px") %>%
+                                                            shinycssloaders::withSpinner(),
+                                                          align = "right"
                                                         ),
-                                                        conditionalPanel(
-                                                          condition = 'input.index_location == 1',
-                                                          shiny::h3("Volatility Overview of 'Dow Jones US' Index Family")
-                                                        ),
-                                                        shiny::h4("date to date relative change of volatility % -levels")
-                                                      )
-                                                    ), 
-                                            
-                                                    shiny::div(
-                                                      # wrapping Output in div lets us align it to the right
-                                                      plotly::plotlyOutput("sector_vola",
-                                                                           width = "100%",
-                                                                           height = "600px") %>%
-                                                        shinycssloaders::withSpinner(),
-                                                      align = "right"
-                                                    ),
-                                                    br(),
-                                                    shiny::div(
-                                                      br(),
-                                                      br(),
-                                                      plotly::plotlyOutput("sector_line",
-                                                                           width = "90%",
-                                                                           height = "600px") %>%
-                                                        shinycssloaders::withSpinner(),
-                                                      align = "center",
-                                                      style = "border-top:1px solid black;"
-                                                    )
+                                                        br(),
+                                                        shiny::div(
+                                                          br(),
+                                                          br(),
+                                                          plotly::plotlyOutput("sector_line",
+                                                                               width = "90%",
+                                                                               height = "600px") %>%
+                                                            shinycssloaders::withSpinner(),
+                                                          align = "center",
+                                                          style = "border-top:1px solid black;"
+                                                        )
+                                            )
                                         )
+                                      ),
+                                      # Index Returns Tab
+                                      shiny::tabPanel(h5(HTML("<b>Index Returns</b>"), style="text-align:center"),
+                                                      id = "idx_returns",
+                                                      shiny::div(
+                                                        class = "container-fluid",
+                                                        shiny::div(
+                                                          class = "text-center text-lg-start",
+                                                          conditionalPanel(
+                                                            condition = 'input.index_location == 2',
+                                                            shiny::h3("Return Overview of 'Stoxx Europe 600' Index Family")
+                                                          ),
+                                                          conditionalPanel(
+                                                            condition = 'input.index_location == 1',
+                                                            shiny::h3("Return Overview of 'Dow Jones US' Index Family")
+                                                          ),
+                                                          shiny::h4("Periode defined log returns of Sector Indices")
+                                                        )
+                                                      ), 
+                                                      shiny::tabsetPanel(id = "single_tabs",
+                                                          # DTD PLot               
+                                                          shiny::tabPanel(h5(HTML("<b>Day-to-Day</b>"), style="text-align:center"),
+                                                                          id = "dtd_plot",
+                                                                          shiny::plotOutput("dtd_ret",
+                                                                                            width = "100%",
+                                                                                            height = "600px") %>%
+                                                                            shinycssloaders::withSpinner()
+                                                                          
+                                                          ),
+                                                          shiny::tabPanel(h5(HTML("<b>Week-to-Day</b>"), style="text-align:center"), 
+                                                                          id = "wtd_plot",
+                                                                          shiny::plotOutput("wtd_ret",
+                                                                                            width = "100%",
+                                                                                            height = "600px") %>%
+                                                                            shinycssloaders::withSpinner()
+                                                                          
+                                                          ),
+                                                          shiny::tabPanel(h5(HTML("<b>Quarter-to-Day</b>"), style="text-align:center"),
+                                                                          id = "qtd_plot",
+                                                                          shiny::plotOutput("qtd_ret",
+                                                                                            width = "100%",
+                                                                                            height = "600px") %>%
+                                                                            shinycssloaders::withSpinner()
+                                                                          
+                                                          ),
+                                                          shiny::tabPanel(h5(HTML("<b>Year-to-Day</b>"), style="text-align:center"), 
+                                                                          id = "ytd_plot",
+                                                                          shiny::plotOutput("ytd_ret",
+                                                                                            width = "100%",
+                                                                                            height = "600px") %>%
+                                                                            shinycssloaders::withSpinner()
+                                                                          
+                                                          )
+                                                      )
+                                      )
                                     )
             ),
         
