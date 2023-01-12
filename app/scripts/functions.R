@@ -52,7 +52,7 @@ write_counter_to_sql <- function(){
     lubridate::now(tzone = "CET"), 
     "%Y-%m-%d %H:%M:%S")
     )
-  
+print("write counter")  
    mydb <- connect_to_DB()
 
    DBI::dbWriteTable(mydb, 
