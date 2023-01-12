@@ -74,7 +74,7 @@ shinyServer(function(input, output, session) {
   vola_history <- DBI::dbGetQuery(conn = mydb,
                                   stringr::str_c(
                                     "SELECT *
-                                  FROM v_fin_index_expanded")) %>% 
+                                  FROM v_fin_index_expanded")) %>%  # View has history of 1 year
     dplyr::mutate(date = lubridate::as_date(date)) %>% 
     dplyr::distinct(ticker_yh, date, .keep_all = T)
   
