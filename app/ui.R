@@ -51,6 +51,7 @@ shinyUI(
           ),
             
         
+      
         # sidebar ----------------------------------------------------------------
         
         shinydashboardPlus::dashboardSidebar(

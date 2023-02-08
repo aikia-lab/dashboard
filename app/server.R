@@ -93,6 +93,7 @@ shinyServer(function(input, output, session) {
   #  --- --- --- --- --- --- --- --- ---
   
   
+  
   DBI::dbDisconnect(mydb)
   
 
