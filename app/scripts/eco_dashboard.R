@@ -7,8 +7,7 @@
 eco_dashboard_fun <- function(){
   
   
-  
-print("start") 
+
   
   
   library(magrittr)
@@ -150,7 +149,7 @@ print("start")
                     row_group.font.weight = "bold") %>% 
     gt::cols_hide(c(data,spark)) 
   
-print("all")  
+
   return(all)
 }
 
