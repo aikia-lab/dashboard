@@ -595,10 +595,78 @@ eco_fc_fun <- function(country_id,type_id){
 
 
 
+# plotly forecats
+get_forecast_curves <- function(new_type){
+  
+  
+  mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+  
+  data_te <- DBI::dbGetQuery(mydb, stringr::str_c("SELECT * 
+                                      FROM eco_forecasts_te
+                                      WHERE country IN ('united-states')
+                                      AND type = '",new_type,"'")) %>% 
+    dplyr::as_tibble() %>% 
+    dplyr::mutate(period_date = lubridate::as_date(period_date))
+  
+  DBI::dbDisconnect(mydb)
+  
+  if(nrow(data_te)<1){
+    return()
+  }
+  
+  # last 8 actuals
+  latest_dots <- data_te %>% 
+    dplyr::filter(period == 'actual') %>% 
+    dplyr::select(period_date, retrieval_date,forecast_value) %>% 
+    dplyr::slice_max(order_by = retrieval_date,n = 10) %>%
+    dplyr::arrange(desc(period_date)) %>% 
+    dplyr::mutate(type = new_type,
+                  latest_period = dplyr::row_number()) %>% 
+    dplyr::select(-retrieval_date,dots = forecast_value, -period_date)
+  
+  
+  
+  # latest forecast
+  latest_forecast <-  data_te %>% 
+    dplyr::filter(period != 'actual'#,
+                  #retrieval_date <= date_id
+    ) %>% 
+    dplyr::select(period_date, retrieval_date,forecast_value) %>%
+    dplyr::group_by(period_date) %>%  
+    dplyr::arrange(period_date,retrieval_date) %>%
+    dplyr::mutate(number = dplyr::row_number(), 
+                  period_date = lubridate::as_date(period_date)) %>%
+    dplyr::filter(number == max(number)) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::arrange(period_date) %>% 
+    dplyr::mutate(type = new_type) %>%
+    dplyr::select(-retrieval_date,-number,dots = forecast_value, period_date) 
+  
+  
+  
+  rt_list <- list(
+    latest_dots,
+    latest_forecast
+  )
+  
+  
+  return(rt_list)
+  
+}
 
 
-
-
+# function for plotting spark lines
+plot_spark <- function(name, df) {
+  plot_object <-
+    ggplot2::ggplot(data = df,
+                    ggplot2::aes(x = period_date, y = dots, group=1)) +
+    ggplot2::geom_line(colour = "#E5ECE9", linewidth = 12) +
+    ggplot2::theme_void() +
+    ggplot2::theme(plot.background = ggplot2::element_rect(fill = "#988B8E"),
+                   plot.margin = ggplot2::margin(0,0,0,0))
+  
+  return(plot_object)
+}
 
 
 

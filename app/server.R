@@ -296,6 +296,20 @@ shinyServer(function(input, output, session) {
 
 # actual vs forecasts -----------------------------------------------------
 
+  # 1st TAB
+  eco_dash_plot <- reactive({
+    eco_dashboard_fun()
+  })
+  
+  
+  output$eco_dash <- gt::render_gt(
+    eco_dash_plot()
+#    height = px(600),
+#    width = px(600)
+  )  
+  
+  
+  # 2nd TAB
   eco_plot <- reactive({
     req(input$choose_eco_country)
     eco_fc_fun(country_id = input$choose_eco_country,

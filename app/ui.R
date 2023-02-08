@@ -359,63 +359,91 @@ shinyUI(
 # Eco actual vs forecasts -------------------------------------------------                  
                   
                   shinydashboard::tabItem(tabName = "eco_fc",
-                                          h2("Economic Actuals vs Forecasts"),
+                                          h2("Economic Market Drivers and Forecasts"),
                                           
-                                          shiny::fluidRow(
-                                            shiny::h3("Check if actual figures match forecasted ones"),
-                                            
-                                            shiny::column(width = 3,
-                                                shiny::selectInput("choose_eco_country", 
-                                                                   label = "Select Country", 
-                                                                   choices = c("United States" = "united-states",
-                                                                               "Euro Area" = "euro-area",
-                                                                               "China" = "china",
-                                                                               "Germany" = "germany",
-                                                                               "Japan" = "japan",
-                                                                               "United Kingdom" = "united-kingdom",
-                                                                               "France" ="france",
-                                                                               "Italy" = "italy",
-                                                                               "India" = "india"),
-                                                                   selected = "united-states"),
-                                            ),
-                                            shiny::column(width = 3,
-                                                shiny::selectInput("choose_eco_type", 
-                                                                   label = "Select economic factor", 
-                                                                   choices = c("Government Bond 10Y",
-                                                                               "Consumer Price Index CPI",
-                                                                               "Inflation Rate",
-                                                                               "Core Inflation Rate",
-                                                                               "Producer Prices",
-                                                                               "GDP Annual Growth Rate",
-                                                                               "Current Account to GDP",
-                                                                               "Initial Jobless Claims",
-                                                                               "Continuing Jobless Claims",
-                                                                               "Job Vacancies",
-                                                                               "Job Offers",
-                                                                               "Building Permits",
-                                                                               "New Home Sales",
-                                                                               "Existing Home Sales",
-                                                                               "Services PMI",
-                                                                               "Manufacturing PMI",
-                                                                               "Business Confidence",
-                                                                               "Business	Inventories",
-                                                                               "Changes in Inventories",
-                                                                               "Bankruptcies",
-                                                                               "Labour Costs",
-                                                                               "Productivity",
-                                                                               "Balance of Trade",
-                                                                               "Imports",
-                                                                               "Exports"),
-                                                                   selected = "Government Bond 10Y")
-                                            )
-                                            
-                                          ),
-                                          br(), br(),br(), br(),
+                                          shiny::tabsetPanel(id = "tabs2",
+                                               
+                                               # Eco Dashboard
+                                               shiny::tabPanel(h5(HTML("<b>ECO Factor Dashboard</b>"), style="text-align:center"),
+                                                                             id = "fcs_plt",
+                                                               shiny::fluidRow(
+                                                                 shiny::h3("Check the last trend of main Market Drivers"),
+                                                                 
+                                                                 br(), br(),br(), br(),
+                                                                 
+                                                                 shiny::column(width = 10,
+                                                                               gt::gt_output("eco_dash") %>%
+                                                                                 shinycssloaders::withSpinner()
+                                                                 )
+                                                                  
+                                                                 
+                                                               )
                                           
-                                          shiny::column(width = 10,
-                                                        plotly::plotlyOutput("eco_forecasts", height = "600px") %>%
-                                                          shinycssloaders::withSpinner()
-                                          )
+                                               ),
+                                               # Act_vs_Fcts
+                                               shiny::tabPanel(h5(HTML("<b>Actuals vs Forecasts</b>"), style="text-align:center"),
+                                                                     id = "fcs_plt",
+                                                         shiny::fluidRow(
+                                                           shiny::h3("Check if actual figures match forecasted ones"),
+                                                           
+                                                           shiny::column(width = 3,
+                                                               shiny::selectInput("choose_eco_country", 
+                                                                                  label = "Select Country", 
+                                                                                  choices = c("United States" = "united-states",
+                                                                                              "Euro Area" = "euro-area",
+                                                                                              "China" = "china",
+                                                                                              "Germany" = "germany",
+                                                                                              "Japan" = "japan",
+                                                                                              "United Kingdom" = "united-kingdom",
+                                                                                              "France" ="france",
+                                                                                              "Italy" = "italy",
+                                                                                              "India" = "india"),
+                                                                                  selected = "united-states"),
+                                                           
+                                                         ),
+                                                           shiny::column(width = 3,
+                                                               shiny::selectInput("choose_eco_type", 
+                                                                                  label = "Select economic factor", 
+                                                                                  choices = c("Government Bond 10Y",
+                                                                                              "Consumer Price Index CPI",
+                                                                                              "Inflation Rate",
+                                                                                              "Core Inflation Rate",
+                                                                                              "Producer Prices",
+                                                                                              "GDP Annual Growth Rate",
+                                                                                              "Current Account to GDP",
+                                                                                              "Initial Jobless Claims",
+                                                                                              "Continuing Jobless Claims",
+                                                                                              "Job Vacancies",
+                                                                                              "Job Offers",
+                                                                                              "Building Permits",
+                                                                                              "New Home Sales",
+                                                                                              "Existing Home Sales",
+                                                                                              "Services PMI",
+                                                                                              "Manufacturing PMI",
+                                                                                              "Business Confidence",
+                                                                                              "Business	Inventories",
+                                                                                              "Changes in Inventories",
+                                                                                              "Bankruptcies",
+                                                                                              "Labour Costs",
+                                                                                              "Productivity",
+                                                                                              "Balance of Trade",
+                                                                                              "Imports",
+                                                                                              "Exports"),
+                                                                                  selected = "Government Bond 10Y")
+                                                          
+                                                           
+                                                         )
+                                                       ),
+                                                     
+                                               
+                                               br(), br(),br(), br(),
+                                               
+                                               shiny::column(width = 10,
+                                                             plotly::plotlyOutput("eco_forecasts", height = "600px") %>%
+                                                               shinycssloaders::withSpinner()
+                                               )
+                                      )
+                                   )
                   )
                         
 
