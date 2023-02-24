@@ -169,7 +169,7 @@ eco_dashboard_fun <- function(){
     aikia::gt_theme_aikia() %>% 
     gt::tab_options(row_group.font.size = "16px",
                     row_group.font.weight = "bold",
-                    data_row.padding = px(1)) %>% 
+                    data_row.padding = px(1)) %>% # gt cells height
     gt::cols_hide(c(data,spark)) 
   
 
