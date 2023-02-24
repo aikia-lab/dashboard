@@ -94,7 +94,29 @@ eco_dashboard_fun <- function(){
     dplyr::left_join(dash_fcts,by=c("type"="fcts")) %>% 
     dplyr::rename(Indicator = type) %>% 
     
-    dplyr::arrange(match(Indicator, c('Government Bond 10Y','Consumer Price Index CPI','Inflation Rate','Core Inflation Rate','Producer Prices','GDP Annual Growth Rate','Current Account to GDP','Initial Jobless Claims','Continuing Jobless Claims','Job Vacancies','Job Offers','Services PMI','Manufacturing PMI','Business Confidence','Business\tInventories','Changes in Inventories','Bankruptcies','Labour Costs','Productivity','Balance of Trade','Imports','Exports'))) %>% 
+    dplyr::arrange(match(Indicator, c('Government Bond 10Y',      #  1
+                                      'Consumer Price Index CPI', #  2
+                                      'Inflation Rate',           #  3
+                                      'Core Inflation Rate',      #  4
+                                      'Producer Prices',          #  5
+                                      'GDP Annual Growth Rate',   #  6
+                                      'Current Account to GDP',   #  7
+                                      'Initial Jobless Claims',   #  8
+                                      'Continuing Jobless Claims',#  9
+                                      'Job Vacancies',            # 10
+                                      'Job Offers',               # 11
+                                      'Services PMI',             # 12
+                                      'Manufacturing PMI',        # 13
+                                      'Business Confidence',      # 14
+                                      'Business\tInventories',    # 15
+                                      'Changes in Inventories',   # 16
+                                      'Bankruptcies',             # 17
+                                      'Labour Costs',             # 18
+                                      'Productivity',             # 19
+                                      'Balance of Trade',         # 20
+                                      'Imports',                  # 21
+                                      'Exports'                   # 22
+                                      ))) %>% 
     
     dplyr::group_by(group) %>% # .[,1] %>% print(n = 21)
     gt::gt() %>%
@@ -106,7 +128,7 @@ eco_dashboard_fun <- function(){
     
     # color rows where high is BAD
     gt::data_color(columns = 2:11,
-                   rows = c(1,3,4,5,8,15,16,17,20),
+                   rows = c(1,2,3,4,5,8,9,12,15,16,17,20),
                    direction = "row",
                    method = "numeric",
                    palette = c("#0F7B7B","#61B7B7","grey","#CC9719","#CC6A19")
@@ -114,7 +136,7 @@ eco_dashboard_fun <- function(){
     
     # color rows where high is GOOD
     gt::data_color(columns = 2:11,
-                   rows = c(2,6,7,9,10,11,12,13,14,18,19,21),
+                   rows = c(6,7,10,11,12,13,14,18,19,21),
                    direction = "row",
                    method = "numeric",
                    palette = c("#CC6A19","#CC9719","grey","#61B7B7","#0F7B7B")
@@ -146,7 +168,8 @@ eco_dashboard_fun <- function(){
     
     aikia::gt_theme_aikia() %>% 
     gt::tab_options(row_group.font.size = "16px",
-                    row_group.font.weight = "bold") %>% 
+                    row_group.font.weight = "bold",
+                    data_row.padding = px(1)) %>% 
     gt::cols_hide(c(data,spark)) 
   
 
