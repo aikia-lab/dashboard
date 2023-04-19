@@ -39,7 +39,7 @@ shinyServer(function(input, output, session) {
   )
   #----------------------------------------------------------
   
-print("Start DB Import")  
+  
   
   # Temprorary Initial load of data Frames
  
@@ -111,7 +111,7 @@ print("Start DB Import")
 
 
   
-#  write_counter_to_sql()
+  write_counter_to_sql()
   
 
 # Resizing aikia logo -----------------------------------------------------
@@ -148,7 +148,7 @@ print("Start DB Import")
   
   
 # Financial Sector Plots --------------------------------------------------
-print("Start Sector Vola")   
+  
   # TAB VOLA PLOTS
   sector_vola <- shiny::reactiveVal(NULL)
   
@@ -194,7 +194,7 @@ print("Start Sector Vola")
 
   })
   
-print("Start Sector Returns")  
+
   # TAB RETURN PLOTS
   sector_returns <- shiny::reactiveVal(NULL)
   
@@ -225,7 +225,7 @@ print("Start Sector Returns")
 # FED Funds Rate ----------------------------------------------------------
   fed_rates <- shiny::reactiveVal(NULL)
   meeting_date <- shiny::reactiveVal(NULL)
-print("Start FED Plot")    
+  
   # Reactive Value for Fed Funds Curve
   shiny::observe({
     fed_rates_plotly <- get_fed_rates_fun(input$fed_date_1,
@@ -256,7 +256,7 @@ print("Start FED Plot")
   
   
 # Index Entropy ----------------------------------------------------------
-print("Start Index Entropy") 
+
   get_idx_entropy <- shiny::reactiveVal(NULL)
   
   # Reactive Value for Fed Funds Curve
@@ -309,7 +309,7 @@ print("Start Index Entropy")
   
 
 # actual vs forecasts -----------------------------------------------------
-print("Start Act vs Fore")
+
   # 1st TAB
   eco_dash_plot <- reactive({
     eco_dashboard_fun(ctry = input$choose_dshbrd_ctry)
@@ -342,7 +342,7 @@ print("Start Act vs Fore")
     
   })  
 
-print("done!")
+
   
 })
 
