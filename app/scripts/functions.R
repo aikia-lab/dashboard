@@ -596,14 +596,14 @@ eco_fc_fun <- function(country_id,type_id){
 
 
 # plotly forecats
-get_forecast_curves <- function(new_type){
+get_forecast_curves <- function(new_type,country){
   
   
   mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
   
   data_te <- DBI::dbGetQuery(mydb, stringr::str_c("SELECT * 
                                       FROM eco_forecasts_te
-                                      WHERE country IN ('united-states')
+                                      WHERE country IN ('",country,"')
                                       AND type = '",new_type,"'")) %>% 
     dplyr::as_tibble() %>% 
     dplyr::mutate(period_date = lubridate::as_date(period_date))
@@ -622,7 +622,7 @@ get_forecast_curves <- function(new_type){
     dplyr::arrange(desc(period_date)) %>% 
     dplyr::mutate(type = new_type,
                   latest_period = dplyr::row_number()) %>% 
-    dplyr::select(-retrieval_date,dots = forecast_value, -period_date)
+    dplyr::select(-retrieval_date,dots = forecast_value) #, -period_date
   
   
   

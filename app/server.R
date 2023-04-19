@@ -39,7 +39,7 @@ shinyServer(function(input, output, session) {
   )
   #----------------------------------------------------------
   
-  
+print("Start DB Import")  
   
   # Temprorary Initial load of data Frames
  
@@ -70,16 +70,28 @@ shinyServer(function(input, output, session) {
                                    FROM fin_ticker_meta_data") %>% 
     dplyr::rename(BIC_1 = bics_level_1_sector_name,
                   BIC_2 = bics_level_2_industry_group_name)
-  
+
+
   vola_history <- DBI::dbGetQuery(conn = mydb,
-                                  stringr::str_c(
                                     "SELECT *
-                                  FROM v_fin_index_expanded")) %>%  # View has history of 1 year
+                                    FROM fin_index_history
+                                    WHERE date > '2022-04-01'") %>%  
     dplyr::mutate(date = lubridate::as_date(date)) %>% 
     dplyr::distinct(ticker_yh, date, .keep_all = T)
   
+  vola_sensi <- DBI::dbGetQuery(conn = mydb,
+                                  "SELECT *
+                                    FROM fin_index_sensi_history
+                                    WHERE date > '2022-04-01'") %>%  
+    dplyr::mutate(date = lubridate::as_date(date)) %>% 
+    dplyr::distinct(ticker_yh, date, .keep_all = T)
   
-  # Get IDX TIC Relation
+  vola_history <- dplyr::left_join(vola_history,vola_sensi,
+                   by = c("ticker_yh","date"))
+
+  
+  
+    # Get IDX TIC Relation
   idx_tic_relation <- DBI::dbGetQuery(mydb, "SELECT * 
                                            FROM fin_ticker_index_relation") %>% # get ISINs for indices 
     dplyr::as_tibble()
@@ -99,7 +111,7 @@ shinyServer(function(input, output, session) {
 
 
   
-  write_counter_to_sql()
+#  write_counter_to_sql()
   
 
 # Resizing aikia logo -----------------------------------------------------
@@ -136,7 +148,7 @@ shinyServer(function(input, output, session) {
   
   
 # Financial Sector Plots --------------------------------------------------
-  
+print("Start Sector Vola")   
   # TAB VOLA PLOTS
   sector_vola <- shiny::reactiveVal(NULL)
   
@@ -182,7 +194,7 @@ shinyServer(function(input, output, session) {
 
   })
   
-  
+print("Start Sector Returns")  
   # TAB RETURN PLOTS
   sector_returns <- shiny::reactiveVal(NULL)
   
@@ -213,7 +225,7 @@ shinyServer(function(input, output, session) {
 # FED Funds Rate ----------------------------------------------------------
   fed_rates <- shiny::reactiveVal(NULL)
   meeting_date <- shiny::reactiveVal(NULL)
-  
+print("Start FED Plot")    
   # Reactive Value for Fed Funds Curve
   shiny::observe({
     fed_rates_plotly <- get_fed_rates_fun(input$fed_date_1,
@@ -244,6 +256,7 @@ shinyServer(function(input, output, session) {
   
   
 # Index Entropy ----------------------------------------------------------
+print("Start Index Entropy") 
   get_idx_entropy <- shiny::reactiveVal(NULL)
   
   # Reactive Value for Fed Funds Curve
@@ -296,10 +309,10 @@ shinyServer(function(input, output, session) {
   
 
 # actual vs forecasts -----------------------------------------------------
-
+print("Start Act vs Fore")
   # 1st TAB
   eco_dash_plot <- reactive({
-    eco_dashboard_fun()
+    eco_dashboard_fun(ctry = input$choose_dshbrd_ctry)
   })
   
   
@@ -329,7 +342,7 @@ shinyServer(function(input, output, session) {
     
   })  
 
-  
+print("done!")
   
 })
 

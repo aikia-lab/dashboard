@@ -4,7 +4,7 @@
 
 
 
-eco_dashboard_fun <- function(){
+eco_dashboard_fun <- function(ctry){
   
   
 
@@ -57,7 +57,7 @@ eco_dashboard_fun <- function(){
   test <- dash_fcts %>%
     dplyr::select(fcts) %>% 
     dplyr::nest_by(fcts) %>% 
-    dplyr::mutate(plot = list(get_forecast_curves(fcts))) %>% 
+    dplyr::mutate(plot = list(get_forecast_curves(fcts,country = ctry))) %>% 
     dplyr::select(-data)
   
   
@@ -66,6 +66,10 @@ eco_dashboard_fun <- function(){
     lapply(test$plot, function(l) l[[1]]) %>% 
     tibble::tibble() %>% 
     tidyr::unnest(cols = c(.))
+  
+  
+  # save latest update
+  latest_update <- gt_act_table %>% dplyr::group_by(type) %>% dplyr::summarise(latest = max(period_date),.groups = "drop")
   
   fcts_prep <- 
     lapply(test$plot, function(l) l[[2]]) %>% 
@@ -84,10 +88,13 @@ eco_dashboard_fun <- function(){
   
   
   table_prep <- gt_act_table %>%
+    dplyr::select(-period_date) %>% 
     dplyr::arrange(desc(latest_period)) %>% 
     tidyr::pivot_wider(names_from = latest_period, values_from = dots) %>%
     dplyr::inner_join(plots, by = "type") %>%
-    dplyr::mutate(ggplot1 = NA)
+    dplyr::mutate(ggplot1 = NA) %>%
+    dplyr::left_join(latest_update, by ="type") %>% 
+    dplyr::relocate(latest,.before = 'ggplot1')
   
   
   all <- table_prep %>% 
@@ -119,10 +126,7 @@ eco_dashboard_fun <- function(){
                                       ))) %>% 
     
     dplyr::group_by(group) %>% # .[,1] %>% print(n = 21)
-    gt::gt() %>%
-    gt::cols_label(
-      ggplot1 = "Forecast"
-    ) %>%
+    gt::gt()  %>%
     gt::tab_spanner(label = "last 10 historical Periods",
                     columns = c(2:11)) %>% 
     
@@ -166,6 +170,14 @@ eco_dashboard_fun <- function(){
     #  gtExtras::gt_plt_sparkline(mpg_data) %>%
     
     
+    gt::tab_style(style = gt::cell_fill(color = "#729C69"),
+                  locations = gt::cells_body(columns = "latest", 
+                                             rows = (latest > lubridate::floor_date(lubridate::today(), 'month')))) %>% 
+    
+    gt::cols_label(
+      ggplot1 = "Forecast",
+      latest = gt::md("latest<br>Update")
+    ) %>% 
     aikia::gt_theme_aikia() %>% 
     gt::tab_options(row_group.font.size = "16px",
                     row_group.font.weight = "bold",

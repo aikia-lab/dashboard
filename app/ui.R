@@ -369,16 +369,19 @@ shinyUI(
                                                                              id = "fcs_plt",
                                                                shiny::fluidRow(
                                                                  shiny::h3("Check the last trend of main Market Drivers"),
-                                                                 
-                                                                 br(), br(),br(), br(),
-                                                                 
+                                                                 shiny::column(width = 3,
+                                                                               shiny::selectInput("choose_dshbrd_ctry", 
+                                                                                                  label = "Select Country", 
+                                                                                                  choices = c("United States" = "united-states"),
+                                                                                                  selected = "united-states"),
+                                                                               
+                                                                 )
+                                                               ),
+                                                                 br(),br(), br(),
                                                                  shiny::column(width = 10,
                                                                                gt::gt_output("eco_dash") %>%
                                                                                  shinycssloaders::withSpinner()
                                                                  )
-                                                                  
-                                                                 
-                                                               )
                                           
                                                ),
                                                # Act_vs_Fcts
