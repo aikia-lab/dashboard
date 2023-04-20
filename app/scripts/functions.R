@@ -599,11 +599,11 @@ eco_fc_fun <- function(country_id,type_id){
 get_forecast_curves <- function(new_type,country){
   
   
-  mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+  mydb <- connect_to_DB()
   
   data_te <- DBI::dbGetQuery(mydb, stringr::str_c("SELECT * 
                                       FROM eco_forecasts_te
-                                      WHERE country IN ('",country,"')
+                                      WHERE country = ('",country,"')
                                       AND type = '",new_type,"'")) %>% 
     dplyr::as_tibble() %>% 
     dplyr::mutate(period_date = lubridate::as_date(period_date))
@@ -611,7 +611,23 @@ get_forecast_curves <- function(new_type,country){
   DBI::dbDisconnect(mydb)
   
   if(nrow(data_te)<1){
-    return()
+    
+    latest_dots_na <- tibble::tibble(period_date = rep(lubridate::today(),10),
+                                     dots = rep(0,10),
+                                     type = rep(new_type,10),
+                                     latest_period = 1:10)
+    
+    latest_forecast_na <- tibble::tibble(period_date = rep(lubridate::today(),4),
+                                         dots = rep(0,4),
+                                         type = rep(new_type,4))
+    
+    rt_list_na <- list(
+      latest_dots_na,
+      latest_forecast_na
+    )
+    
+    
+    return(rt_list_na)
   }
   
   # last 8 actuals
@@ -622,7 +638,7 @@ get_forecast_curves <- function(new_type,country){
     dplyr::arrange(desc(period_date)) %>% 
     dplyr::mutate(type = new_type,
                   latest_period = dplyr::row_number()) %>% 
-    dplyr::select(-retrieval_date,dots = forecast_value) #, -period_date
+    dplyr::select(-retrieval_date,dots = forecast_value)#, -period_date
   
   
   
@@ -640,7 +656,9 @@ get_forecast_curves <- function(new_type,country){
     dplyr::ungroup() %>% 
     dplyr::arrange(period_date) %>% 
     dplyr::mutate(type = new_type) %>%
-    dplyr::select(-retrieval_date,-number,dots = forecast_value, period_date) 
+    dplyr::select(-retrieval_date,-number,dots = forecast_value, period_date) %>% 
+    dplyr::filter(period_date > max(latest_dots$period_date)) %>% 
+    tidyr::fill(dots,.direction = "downup")
   
   
   

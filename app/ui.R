@@ -372,7 +372,8 @@ shinyUI(
                                                                  shiny::column(width = 3,
                                                                                shiny::selectInput("choose_dshbrd_ctry", 
                                                                                                   label = "Select Country", 
-                                                                                                  choices = c("United States" = "united-states"),
+                                                                                                  choices = c("United States" = "united-states",
+                                                                                                              "China" = "china"),
                                                                                                   selected = "united-states"),
                                                                                
                                                                  )
