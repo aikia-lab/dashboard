@@ -373,7 +373,14 @@ shinyUI(
                                                                                shiny::selectInput("choose_dshbrd_ctry", 
                                                                                                   label = "Select Country", 
                                                                                                   choices = c("United States" = "united-states",
-                                                                                                              "China" = "china"),
+                                                                                                              "Euro Area" = "euro-area",
+                                                                                                              "China" = "china",
+                                                                                                              "Germany" = "germany",
+                                                                                                              "Japan" = "japan",
+                                                                                                              "United Kingdom" = "united-kingdom",
+                                                                                                              "France" ="france",
+                                                                                                              "Italy" = "italy",
+                                                                                                              "India" = "india"),
                                                                                                   selected = "united-states"),
                                                                                
                                                                  )
