@@ -303,8 +303,9 @@ shinyUI(
                                                                            choices = c("S&P 500" = "^GSPC",
                                                                                        "Nasdaq 100" = "^NDX",
                                                                                        "Euro Stoxx 50" = "^STOXX50E",
-                                                                                       "DAX 40" = "^GDAXI",
-                                                                                       "ASX" = "^AXJO"),
+                                                                                       "DAX 40" = "^GDAXI"#,
+                                                                                       #"ASX" = "^AXJO"
+                                                                                       ),
                                                                            selected = "^NDX")
                                           ),
                                         
