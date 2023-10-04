@@ -480,7 +480,7 @@ entrop_tic_group_fun <- function(start_date, cur_idx, corr_th, sector_info, grou
 
 eco_fc_fun <- function(country_id,type_id){
   
-  mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+  mydb <- aikia::connect_to_db()
   
   data_te <- DBI::dbGetQuery(mydb, stringr::str_c("SELECT * 
                                     FROM eco_forecasts_te
