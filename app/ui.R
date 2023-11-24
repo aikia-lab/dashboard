@@ -417,31 +417,50 @@ shinyUI(
                                                            shiny::column(width = 3,
                                                                shiny::selectInput("choose_eco_type", 
                                                                                   label = "Select economic factor", 
-                                                                                  choices = c("Government Bond 10Y",
-                                                                                              "Consumer Price Index CPI",
-                                                                                              "Inflation Rate",
-                                                                                              "Core Inflation Rate",
-                                                                                              "Producer Prices",
-                                                                                              "GDP Annual Growth Rate",
-                                                                                              "Current Account to GDP",
-                                                                                              "Initial Jobless Claims",
-                                                                                              "Continuing Jobless Claims",
-                                                                                              "Job Vacancies",
-                                                                                              "Job Offers",
-                                                                                              "Building Permits",
-                                                                                              "New Home Sales",
-                                                                                              "Existing Home Sales",
-                                                                                              "Services PMI",
-                                                                                              "Manufacturing PMI",
-                                                                                              "Business Confidence",
-                                                                                              "Business	Inventories",
-                                                                                              "Changes in Inventories",
-                                                                                              "Bankruptcies",
-                                                                                              "Labour Costs",
-                                                                                              "Productivity",
-                                                                                              "Balance of Trade",
-                                                                                              "Imports",
-                                                                                              "Exports"),
+                                                                                  choices = c("Government Bond 10Y"                               
+                                                                                              ,"Currency"                        
+                                                                                              ,"Inflation Rate"                                   
+                                                                                              ,"Core Inflation Rate"                              
+                                                                                              ,"CPI seasonally adjusted"         
+                                                                                              ,"Producer Prices Change"          
+                                                                                              ,"Core Producer Prices YoY"        
+                                                                                              ,"Manufacturing PMI"                                
+                                                                                              ,"Services PMI"                     
+                                                                                              ,"Consumer Confidence"              
+                                                                                              ,"Money Supply M0"                                   
+                                                                                              ,"Money Supply M1"                                 
+                                                                                              ,"Money Supply M2"                            
+                                                                                              ,"Balance of Trade"                                    
+                                                                                              ,"Imports"                                          
+                                                                                              ,"Exports"                           
+                                                                                              ,"Current Account to GDP"          
+                                                                                              ,"GDP Annual Growth Rate"          
+                                                                                              ,"Consumer Spending"                                  
+                                                                                              ,"Consumer Credit"                 
+                                                                                              ,"Bank Lending Rate"               
+                                                                                              ,"Mortgage Rate"                   
+                                                                                              ,"Unemployment Rate"                                
+                                                                                              ,"Initial Jobless Claims"          
+                                                                                              ,"Continuing Jobless Claims"       
+                                                                                              ,"Non Farm Payrolls"               
+                                                                                              ,"Average Hourly Earnings YoY"                      
+                                                                                              ,"Average Weekly Hours"            
+                                                                                              ,"Banks Balance Sheet"               
+                                                                                              ,"Business Confidence"             
+                                                                                              ,"Central Bank Balance Sheet"       
+                                                                                              ,"Changes in Inventories"          
+                                                                                              ,"Factory Orders"                  
+                                                                                              ,"Industrial Production"           
+                                                                                              ,"Job Offers"                       
+                                                                                              ,"Job Vacancies"                    
+                                                                                              ,"Labour Costs"                    
+                                                                                              ,"Personal Spending"               
+                                                                                              ,"Private Sector Credit"           
+                                                                                              ,"Productivity"                     
+                                                                                              ,"Retail Sales MoM"                
+                                                                                              ,"Retail Sales YoY"                
+                                                                                              ,"Wage Growth"                     
+                                                                                              ,"Bankruptcies"),
                                                                                   selected = "Government Bond 10Y")
                                                           
                                                            
